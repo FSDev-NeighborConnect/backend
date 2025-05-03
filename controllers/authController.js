@@ -1,1 +1,0 @@
-// Will contain HTTP controllers for routes requiring authentication
