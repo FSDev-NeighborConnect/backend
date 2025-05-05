@@ -7,7 +7,6 @@ async function hashPassword(password) {
 
 async function comparePassword(input, passHash) {
   return await bcrypt.compare(input, passHash); // checks if input matches password hash in DB, return bool 
-
 }
 
 module.exports = { hashPassword, comparePassword };
