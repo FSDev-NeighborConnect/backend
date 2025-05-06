@@ -6,4 +6,6 @@ const { authenticate } = require('../middleware/authenticate');
 // Get all posts route, authenticates user first
 router.get('/', authenticate, getAllPosts);
 
+router.get('/', authenticate, getPostsByZip);
+
 module.exports = router;
