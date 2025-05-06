@@ -19,12 +19,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false
   },
-  status: { // Allow manual approval of registration by admin
-    type: String,
-    enum: ['active', 'pending', 'denied'],
-    default: 'pending',
-    required: true
-  },
   streetAddress: {
     type: String,
     required: true
@@ -47,7 +41,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['member', 'admin'], // Only allow 'member' & 'admin' values
+    enum: ['member'], // Only allow 'member' & 'admin' values
     required: true,
   },
   hobbies: [String]
