@@ -24,7 +24,30 @@ exports.getPostsByZip = async (req, res) =>{
 };
 
 
+exports.createPost = async (req, res) => {
+  try {
+    const { title, description, category, status } = req.body;
 
+    // Get user info from authenticate.js
+    const user = req.user;
+
+    // Get Street and postal code from user object
+    const street  = user.streetAddress ;
+    const postalCode = user.postalCode ;
+
+    const newPost = new Post ({title, description, category, street,
+      postalCode, status, createdBy: user._id });
+    
+      // in case need to return this const savedPost = 
+     await newPost.save ();
+    res.status(201).json({message : 'Post created successfully'
+      // , post: savedPost (in case need to return post.)
+    });
+  
+  } catch (err) {
+    next (err);
+  }
+}
 
 
 module.exports = getAllPosts;
