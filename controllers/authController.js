@@ -1,6 +1,6 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User.js');
-const { hashPassword, comparePassword } = require('../services/auth.js')
+const auth = require('../services/auth.js')
 const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res, next) => {
@@ -25,7 +25,7 @@ exports.registerUser = async (req, res, next) => {
             return res.status(400).json({ message: "User already exists" });
         }
         // if existingUser is NOT found
-        const hashedPassword = await hashPassword(password);
+        const hashedPassword = await auth.hashPassword(password);
         const newUser = new User({
             name,
             email,
@@ -70,21 +70,17 @@ exports.loginUser = async (req, res, next) => {
             // if user found in DB, password matches JWT token generated & sent.
             // Need to be included in .env file JWT_SECRET=yourSuperSecretKey
             if (userStatus === "approved") {
-                const pwdMatch = await comparePassword(password, existingUser.password);
+                const pwdMatch = await auth.comparePassword(password, existingUser.password);
                 if (pwdMatch) {
                     const { _id: id, email, role } = existingUser;
-                    const token = jwt.sign(
-                        { userId: id, role },
-                        process.env.JWT_SECRET,
-                        { expiresIn: '1h' });
-
+                    const token = auth.generateToken({ sub: id, role });
                     return res.status(200).json({
                         message: 'Login Successful.',
                         token,
                         user: { id, email, role }
                     });
                 } else {
-                    return res.status(400).json({ message: 'Incorrect Password.' });
+                    return res.status(401).json({ message: 'Incorrect Password.' });
                 }
             }
         }
