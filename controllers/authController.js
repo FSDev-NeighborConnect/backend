@@ -3,7 +3,7 @@ const User = require('../models/User.js');
 const auth = require('../services/authService.js')
 const jwt = require('jsonwebtoken');
 
-exports.registerUser = async (req, res, next) => {
+const registerUser = async (req, res, next) => {
     // Getting data from react form
     const { name,
         email,
@@ -48,7 +48,7 @@ exports.registerUser = async (req, res, next) => {
     }
 };
 
-exports.loginUser = async (req, res, next) => {
+const loginUser = async (req, res, next) => {
 
     try {
         // getting email & password from login react form 
@@ -91,4 +91,4 @@ exports.loginUser = async (req, res, next) => {
     }
 }
 
-
+module.exports = { registerUser, loginUser };
