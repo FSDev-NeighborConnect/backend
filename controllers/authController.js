@@ -1,6 +1,6 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User.js');
-const auth = require('../services/auth.js')
+const auth = require('../services/authService.js')
 const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res, next) => {

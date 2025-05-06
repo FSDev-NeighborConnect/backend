@@ -7,7 +7,8 @@ const express = require('express');
 const path = require('path');
 
 //Addition of controllers
-const authRoute = require('./routes/authRoute');
+const authRoutes = require('./routes/authRoutes');
+const postRoutes = require('./routes/postRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -27,13 +28,14 @@ app.get('/', (req, res) => {
 // Provide the location of files to browser like index.html, logo.png, main.js etc.
 // app.use(express.static(path.join(__dirname, '../client/build')));
 
-
-app.use('/api', authRoute); // routes start with /api
+app.use('/api', authRoutes); // routes start with /api
 // Uncomment it as it is requred.
 // For all other pages just get index.html. Everything else will be handeled by React.
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 // });
+
+app.use('/api/posts', postRoutes);
 
 // registers the function into Express’s internal middleware system.
 app.use(errorHandler);
