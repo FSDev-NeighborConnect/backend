@@ -14,7 +14,7 @@ const getAllPosts = async (req, res) => {
 exports.getPostsByZip = async (req, res) =>{
     try {
         const user = await User.findById (req.user.userID) //to get the current user from DB from data recd. via authenticate next
-        const postalCode = user.postalCode;
+        const zipCode = user.postalCode;
 
         const posts = await Post.find({postalCode}).populate ('createdBy', 'name');
         res.status(200).json(posts);
