@@ -49,5 +49,21 @@ exports.createPost = async (req, res) => {
   }
 }
 
+exports.getPostByID = async (req, res, next) => {
+  try {
+    const postId = req.params.id;
+    // Find post in DB using post ID received in request and populate the creator's name
+    const postDetails = await Post.findById(postId).populate('createdBy', 'name');
+    if (postDetails){
+    return res.status (200).json({postDetails});
+    } else {
+    return res.status(404).json({message: 'Page not found'})
+    }
+    
+  } catch(err){
+  next(err);
+  }
+}
+
 
 module.exports = getAllPosts;
