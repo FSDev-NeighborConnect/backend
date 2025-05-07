@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser } = require('../controllers/authController');
+const {validateLogIn, validateSignUp} = require ('../middleware/validator')
 
 
 //Sign Up route
-router.post('/signup', registerUser);
+router.post('/signup',validateSignUp, registerUser);
 
 // Log in route
-router.post('/login', loginUser)
+router.post('/login', validateLogIn, loginUser)
 
 router.put('/:id', updateUser)
 

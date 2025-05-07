@@ -7,19 +7,21 @@ const express = require('express');
 const path = require('path');
 
 //Addition of controllers
-const authRoute = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
+const postRoutes = require('./routes/postRoutes');
+const userRoutes = require('./routes/userRoutes')
 const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
-const userRoutes = require('./routes/userRoutes');
-const postRoutes = require('./routes/postRoutes');
-
 
 const app = express();
 
 //Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
-app.use(cors()); // Allow requests from frontend as both had different port.
+app.use(cors({
+  // origin: frontend deployment url, to be added later
+  credentials: true
+})); // Allow requests with cookies from frontend as both had different port.
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
@@ -32,8 +34,7 @@ app.get('/', (req, res) => {
 // Provide the location of files to browser like index.html, logo.png, main.js etc.
 // app.use(express.static(path.join(__dirname, '../client/build')));
 
-
-app.use('/api', authRoute); // routes start with /api
+app.use('/api', authRoutes); // routes start with /api
 // Uncomment it as it is requred.
 // For all other pages just get index.html. Everything else will be handeled by React.
 // app.get('*', (req, res) => {
