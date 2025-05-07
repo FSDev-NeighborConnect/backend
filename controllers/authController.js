@@ -55,7 +55,16 @@ exports.loginUser = async (req, res, next) => {
       const userExists = await User.findOne({ email: email.toLowerCase() });
   
       if (userExists) {
-      
+        // Optional future logic for status:
+        // const userStatus = userExists.status;
+        // if (userStatus === "approval pending") {
+        //   return res.status(409).json({ message: "Request pending for approval." });
+        // }
+  
+        // if (userStatus === "disqualified") {
+        //   return res.status(403).json({ message: "Access denied." });
+        // }
+  
         const pwdMatch = await bcrypt.compare(password, userExists.password);
   
         if (pwdMatch) {
