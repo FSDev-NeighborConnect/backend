@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['member', 'admin'], // Only allow 'member' & 'admin' values
     required: true,
+    default: 'member'
   },
   hobbies: [String]
 }, {

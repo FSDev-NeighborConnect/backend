@@ -10,4 +10,6 @@ router.post('/signup',validateSignUp, registerUser);
 // Log in route
 router.post('/login', validateLogIn, loginUser)
 
+router.put('/:id', updateUser)
+
 module.exports = router;

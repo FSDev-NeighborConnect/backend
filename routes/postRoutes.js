@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getAllPosts, getPostsByZip, createPost, getPostById } = require('../controllers/postController');
+
+const { getAllPosts, getPostsByZip, createPost, getPostById, deletePost } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
 const { validatePostID, validatePostCreation} = require('../middleware/validator');
 
@@ -15,5 +16,7 @@ router.post ('/post', authenticate, validatePostCreation, createPost)
 
 // Visit a post 
 router.get ('/:id', authenticate, validatePostID, getPostById)
+
+router.delete('/:id', authenticate, deletePost);
 
 module.exports = router;

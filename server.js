@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes')
 const errorHandler = require('./middleware/errorHandler');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -21,6 +22,10 @@ app.use(cors({
   // origin: frontend deployment url, to be added later
   credentials: true
 })); // Allow requests with cookies from frontend as both had different port.
+
+app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server running.' });
@@ -35,9 +40,6 @@ app.use('/api', authRoutes); // routes start with /api
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 // });
-
-app.use('/api/posts', postRoutes);
-app.use('/api/user', userRoutes);
 
 // registers the function into Express’s internal middleware system.
 app.use(errorHandler);
