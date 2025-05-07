@@ -1,0 +1,1 @@
+// Authentication logic to be used by controllers
