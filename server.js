@@ -10,6 +10,7 @@ const path = require('path');
 const authRoute = require('./routes/authRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true })); //Added extended true to get ne
 app.use(cors()); // Allow requests from frontend as both had different port.
 
 app.use('/api/admin', adminRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server running.' });
