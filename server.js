@@ -11,6 +11,7 @@ const authRoute = require('./routes/authRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(cors()); // Allow requests from frontend as both had different port.
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server running.' });
