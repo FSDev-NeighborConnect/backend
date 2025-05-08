@@ -1,5 +1,5 @@
 // To Validate and sanitize input
-
+const {sanitizeHtml} = require('./sanitizeHtml')
 const { check, param } = require("express-validator");
 
 // Validate the get request for all user to prevent injections
@@ -17,4 +17,26 @@ exports.validateGetAllUsers = [
 
     next();
   }
+];
+
+// To validate & Sanitize LogIn request    
+exports.validateLogIn = [
+  sanitizeInputFields(['email', 'password']),
+  check ('email')
+    .isEmail() // to check if input is a valid email id 
+    .withMessage ('Enter a valid email.')
+    .trim()
+    .escape(),// removes dangerous characters
+
+    check ('password')
+      .isLength({min: 8})
+      .withMessage ('Password should be of minimum 8 chars.')
+      .trim()
+];
+
+// To validate Post ID request
+exports.validatePostId = [
+  param('id')
+    .isMongoId()
+    .withMessage ('Invalid ID !')
 ];
