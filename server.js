@@ -5,7 +5,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const express = require('express');
 const path = require('path');
-const mongoSanitize = require('express-mongo-sanitize');
+const mongoSanitize = require('express-mongo-sanitize'); //To sanitize MongoDB injections
 
 //Addition of controllers
 const authRoutes = require('./routes/authRoutes');
