@@ -22,4 +22,13 @@ function setAuthCookies(res, user) {
 
 }
 
+// Logout logic for endpoint, to be implemented later
+function clearAuthCookies(res) {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None'
+  });
+}
+
 module.exports = { setAuthCookies, clearAuthCookies };
