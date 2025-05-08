@@ -1,8 +1,7 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { setAuthCookies } = require('../services/authServices');
+const { hashPassword, comparePasswords } = require('../utils/hash');
 
 exports.registerUser = async (req, res, next) => {
   // Getting data from react form
@@ -25,7 +24,7 @@ exports.registerUser = async (req, res, next) => {
       return res.status(400).json({ message: "User already exists." }); // need to redirect to home page or login page.
     }
     // if existingUser is NOT found
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
     const newUser = new User({
       name,
       email,
@@ -56,7 +55,7 @@ exports.loginUser = async (req, res, next) => {
     const userExists = await User.findOne({ email: email.toLowerCase() });
 
     if (userExists) {
-      const pwdMatch = await bcrypt.compare(password, userExists.password);
+      const pwdMatch = await comparePasswords(password, userExists.password);
 
       if (pwdMatch) {
         setAuthCookies(userExists);
