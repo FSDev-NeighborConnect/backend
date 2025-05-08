@@ -9,6 +9,6 @@ const { validateUserId } = require('../middleware/validator')
 router.get('/user/:id', authenticate, validateUserId, getUserById);
 
 // Update own user
-router.put('/:id', updateUser)
+router.put('/:id', authenticate, updateUser)
 
 module.exports = router;

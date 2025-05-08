@@ -5,6 +5,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 //Addition of controllers
 const authRoutes = require('./routes/authRoutes');
@@ -17,6 +18,7 @@ const app = express();
 
 //Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
 app.use(cors({
   // origin: frontend deployment url, to be added later
