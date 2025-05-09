@@ -2,8 +2,10 @@
 
 const { check, param } = require("express-validator");
 
-exports.validateUserId =[
+exports.validatePostCreation = [];
+
+exports.validateUserId = [
   param('id')
-  .isMongoId().withMessage('Invalid user ID')
+    .isMongoId().withMessage('Invalid user ID')
 ]
 
