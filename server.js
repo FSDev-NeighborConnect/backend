@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
 app.use(cors({
-  // origin: frontend deployment url, to be added later
+  origin: process.env.FRONTEND_URL,
   credentials: true
 })); // Allow requests with cookies from frontend as both had different port.
 
