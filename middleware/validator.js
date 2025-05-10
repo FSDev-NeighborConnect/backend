@@ -1,5 +1,5 @@
 // To Validate and sanitize input
-const { sanitizeInputFields } = require('./sanitizeHtml')
+const { sanitizeInputFields } = require('./sanitize')
 const { check, param } = require("express-validator");
 
 // Validate the get request for all user to prevent injections
