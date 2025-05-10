@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Post = require('../models/Post');
 
 // PUT /api/admin/users/:id
 const adminUpdateUser = async (req, res) => {
@@ -45,8 +46,27 @@ const getAllUsers = async (req, res, next) => {
   }
 }
 
+// Admin rights to delete post
+const adminDeletePost = async (req, res, next) => {
+  try {
+    const postId = req.params.id;
+    // Find post in DB using post ID received in request and populate the creator's name
+    const deletePost = await Post.findByIdAndDelete(postId);
+
+    if (deletePost) {
+      return res.status(200).json({ message: 'Post deleted successfully.' });
+    } else {
+      return res.status(404).json({message: 'Post not found.'})
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
-  getAllUsers
+  getAllUsers,
+  adminDeletePost
 };
