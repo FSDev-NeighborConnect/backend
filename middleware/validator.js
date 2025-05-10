@@ -2,10 +2,17 @@
 
 const { check, param } = require("express-validator");
 
-exports.validatePostCreation = [];
+const validatePostID = [];
 
-exports.validateUserId = [
+const validatePostCreation = [];
+
+const validateSignUp = [];
+
+const validateLogIn = [];
+
+const validateUserId = [
   param('id')
     .isMongoId().withMessage('Invalid user ID')
 ]
 
+module.exports = { validateSignUp, validateUserId, validateLogIn, validatePostCreation, validatePostID };

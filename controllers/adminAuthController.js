@@ -1,6 +1,6 @@
 const User = require('../models/User');
 const { comparePasswords } = require('../utils/hash');
-const { setAuthCookies } = require('../services/authService');
+const { setAuthCookies } = require('../services/authServices');
 
 async function adminLogin(req, res) {
   const { email, password } = req.body;

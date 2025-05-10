@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = function authenticate(req, res, next) {
+function authenticate(req, res, next) {
   const token = req.cookies.token;
   if (!token) {
     return res.status(401).json({ message: 'Access forbidden, user not authenticated!' });
@@ -13,3 +13,6 @@ module.exports = function authenticate(req, res, next) {
     res.status(401).json({ message: 'Invalid or expired token!' });
   }
 };
+
+
+module.exports = { authenticate };

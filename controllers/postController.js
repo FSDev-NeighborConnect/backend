@@ -11,20 +11,20 @@ const getAllPosts = async (req, res) => {
 };
 
 
-exports.getPostsByZip = async (req, res) =>{
-    try {
-        const user = await User.findById (req.user.userID) //to get the current user from DB from data recd. via authenticate next
-        const postalCode = user.postalCode;
+const getPostsByZip = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userID) //to get the current user from DB from data recd. via authenticate next
+    const postalCode = user.postalCode;
 
-        const posts = await Post.find({postalCode}).populate ('createdBy', 'name');
-        res.status(200).json(posts);
-    } catch (err){
-        res.status(500).json({message : 'Failed to fetch posts!', error : err.message})
-    }
+    const posts = await Post.find({ postalCode }).populate('createdBy', 'name');
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch posts!', error: err.message })
+  }
 };
 
 
-exports.createPost = async (req, res) => {
+const createPost = async (req, res) => {
   try {
     const { title, description, category, status } = req.body;
 
@@ -32,36 +32,39 @@ exports.createPost = async (req, res) => {
     const user = req.user;
 
     // Get Street and postal code from user object
-    const street  = user.streetAddress ;
-    const postalCode = user.postalCode ;
+    const street = user.streetAddress;
+    const postalCode = user.postalCode;
 
-    const newPost = new Post ({title, description, category, street,
-      postalCode, status, createdBy: user._id });
-    
-      // in case need to return this const savedPost = 
-     await newPost.save ();
-    res.status(201).json({message : 'Post created successfully'
+    const newPost = new Post({
+      title, description, category, street,
+      postalCode, status, createdBy: user._id
+    });
+
+    // in case need to return this const savedPost = 
+    await newPost.save();
+    res.status(201).json({
+      message: 'Post created successfully'
       // , post: savedPost (in case need to return post.)
     });
-  
+
   } catch (err) {
-    next (err);
+    next(err);
   }
 }
 
-exports.getPostByID = async (req, res, next) => {
+const getPostByID = async (req, res, next) => {
   try {
     const postId = req.params.id;
     // Find post in DB using post ID received in request and populate the creator's name
     const postDetails = await Post.findById(postId).populate('createdBy', 'name');
-    if (postDetails){
-    return res.status (200).json({postDetails});
+    if (postDetails) {
+      return res.status(200).json({ postDetails });
     } else {
-    return res.status(404).json({message: 'Page not found'})
+      return res.status(404).json({ message: 'Page not found' })
     }
-    
-  } catch(err){
-  next(err);
+
+  } catch (err) {
+    next(err);
   }
 }
 
@@ -88,4 +91,4 @@ const deletePost = async (req, res) => {
 };
 
 
-module.exports = { getAllPosts, deletePost };
+module.exports = { getAllPosts, deletePost, getPostsByZip, createPost, getPostByID };
