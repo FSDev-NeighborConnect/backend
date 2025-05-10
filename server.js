@@ -5,7 +5,7 @@ const cors = require('cors');
 const PORT = process.env.PORT || 5000;
 const express = require('express');
 const path = require('path');
-const mongoSanitize = require('express-mongo-sanitize'); //To sanitize MongoDB injections
+const { sanitizeRequest } = require('./middleware/sanitize');
 const cookieParser = require('cookie-parser');
 
 //Addition of controllers
@@ -19,7 +19,7 @@ const app = express();
 
 //Middleware
 app.use(express.json());
-app.use(mongoSanitize()); //protect from NoSQL injection by removing '$' and '.'
+app.use(sanitizeRequest); //protect from NoSQL injection by removing '$' and '.'
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
 app.use(cors({
