@@ -1,9 +1,9 @@
 // To Validate and sanitize input
-const {sanitizeHtml} = require('./sanitizeHtml')
+const { sanitizeHtml } = require('./sanitizeHtml')
 const { check, param } = require("express-validator");
 
 // Validate the get request for all user to prevent injections
-exports.validateGetAllUsers = [
+const validateGetAllUsers = [
   (req, res, next) => {
     const forbiddenKeys = Object.keys(req.query).filter(key =>
       key.includes('$') || key.includes('.') || key.toLowerCase().includes('password')
@@ -20,7 +20,7 @@ exports.validateGetAllUsers = [
 ];
 
 // To validate & Sanitize LogIn request    
-exports.validateLogIn = [
+const validateLogIn = [
   sanitizeInputFields(['email', 'password']),
   check ('email')
     .isEmail() // to check if input is a valid email id 
@@ -35,14 +35,14 @@ exports.validateLogIn = [
 ];
 
 // To validate Post ID request
-exports.validatePostId = [
+const validatePostId = [
   param('id')
     .isMongoId()
     .withMessage ('Invalid ID !')
 ];
 
 // To validate & Sanitize post creation request
-exports.validatePostCreation = [
+const validatePostCreation = [
   sanitizeInputFields(['title', 'description']),
 check('title')
   .notEmpty().withMessage('Title is required')
@@ -58,13 +58,13 @@ check('status')
 ];
 
 // To validate fetch user request based on id.
-exports.validateUserId =[
+const validateUserId =[
   param('id')
-  .isMongoId().withMessage('Invalid user ID')
+    .isMongoId().withMessage('Invalid user ID')
 ]
 
 // To validate sign up request
-exports.validateSignUp = [
+const validateSignUp = [
 
   sanitizeInputFields([
       'name', 'email','streetAddress','postalCode', 'phone', 'bio'
@@ -116,13 +116,4 @@ check('hobbies')
   .custom((arr) => arr.every(item => typeof item === 'string')).withMessage('Each hobby must be a string')
 ];
 
-
-
-
-
-
-
-
-
-
-
+module.exports = { validateSignUp, validateUserId, validateLogIn, validatePostCreation, validatePostId, validateGetAllUsers };
