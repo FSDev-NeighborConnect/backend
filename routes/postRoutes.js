@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { getAllPosts, getPostsByZip, createPost, deletePost, getPostByID } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
-const { validatePostID, validatePostCreation } = require('../middleware/validator');
+const { validatePostId, validatePostCreation } = require('../middleware/validator');
 
 // Get all posts route, authenticates user first
 router.get('/all/posts', authenticate, getAllPosts);
@@ -15,7 +15,7 @@ router.get('/zip', authenticate, getPostsByZip);
 router.post('/post', authenticate, validatePostCreation, createPost)
 
 // Visit a post 
-router.get('/:id', authenticate, validatePostID, getPostByID)
+router.get('/:id', authenticate, validatePostId, getPostByID)
 
 router.delete('/:id', authenticate, deletePost);
 
