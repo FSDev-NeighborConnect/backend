@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { adminUpdateUser, adminDeleteUser, getAllUsers, adminDeletePost } = require('../controllers/adminController');
-const authenticate = require('../middleware/authenticate');
-const requireAdmin = require('../middleware/adminMiddleware');
+const { authenticate } = require('../middleware/authenticate');
+const { requireAdmin } = require('../middleware/adminMiddleware');
 const { adminLogin } = require('../controllers/adminAuthController');
 const { validatePostId } = require('../middleware/validator');
 
