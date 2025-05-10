@@ -52,7 +52,7 @@ exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const userExists = await User.findOne({ email: email.toLowerCase() });
+    const userExists = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (userExists) {
       const pwdMatch = await comparePasswords(password, userExists.password);
