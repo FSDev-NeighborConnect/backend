@@ -1,18 +1,23 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById, updateUser } = require('../controllers/userController');
+const { getUserById, updateUser, getUsersByZip, deleteUser } = require('../controllers/userController');
 const { getAllUsers } = require('../controllers/adminController');
-const { authenticate } = require('../middleware/authenticate')
+const { authenticate } = require('../middleware/authenticate');
+const { csrfProtection } = require('../middleware/csrf');
 const { requireAdmin } = require('../middleware/adminMiddleware');
-const { validateUserId, validateGetAllUsers } = require('../middleware/validator');
+const { validateUserId, validateGetAllUsers, validateZipCode } = require('../middleware/validator');
+
+router.use(authenticate);
+router.use(csrfProtection);
 
 // Route to get all users, admin only
-router.get('/all/users', authenticate, requireAdmin, validateGetAllUsers, getAllUsers);
-
+router.get('/all/users', requireAdmin, validateGetAllUsers, getAllUsers); // Route is mounted on /api/users, no need for /all/users
 // Route to get user by id
-router.get('/user/:id', authenticate, validateUserId, getUserById);
-
+router.get('/user/:id', validateUserId, getUserById);
 // Update own user
-router.put('/:id', authenticate, updateUser);
+router.put('/:id', updateUser);
+router.get('/zip/:zip', validateZipCode, getUsersByZip);
+router.delete('/:id', deleteUser);
+
 
 module.exports = router;

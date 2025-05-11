@@ -114,4 +114,18 @@ const validateSignUp = [
     .custom((arr) => arr.every(item => typeof item === 'string')).withMessage('Each hobby must be a string')
 ];
 
-module.exports = { validateSignUp, validateUserId, validateLogIn, validatePostCreation, validatePostId, validateGetAllUsers };
+const validateZipCode = [
+  param('zip')
+    .isPostalCode('any')
+    .withMessage('Invalid postal code')
+];
+
+module.exports = {
+  validateSignUp,
+  validateUserId,
+  validateLogIn,
+  validatePostCreation,
+  validatePostId,
+  validateGetAllUsers,
+  validateZipCode
+};
