@@ -63,4 +63,29 @@ async function deleteUser(req, res) {
     }
 }
 
-module.exports = { getUserById, updateUser, getUsersByZip, deleteUser };
+const uploadAvatarImage = async (req, res) => {
+    try {
+        const imageUrl = req.file.path;
+        const userId = req.user.id;
+
+        await User.findByIdAndUpdate(userId, { avatarUrl: imageUrl });
+        res.status(200).json({ message: 'Avatar uploaded', url: imageUrl });
+    } catch (err) {
+        res.status(500).json({ error: 'Avatar upload failed' });
+    }
+};
+
+const uploadCoverImage = async (req, res) => {
+    try {
+        const imageUrl = req.file.path;
+        const userId = req.user.id;
+
+        await User.findByIdAndUpdate(userId, { coverUrl: imageUrl });
+        res.status(200).json({ message: 'Cover uploaded', url: imageUrl });
+    } catch (err) {
+        res.status(500).json({ error: 'Cover upload failed' });
+    }
+};
+
+
+module.exports = { getUserById, updateUser, getUsersByZip, deleteUser, uploadAvatarImage, uploadCoverImage };

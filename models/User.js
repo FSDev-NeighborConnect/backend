@@ -31,8 +31,10 @@ const userSchema = new mongoose.Schema({
     type: String, // String due to + & leading zeros
     required: true
   },
-  avatarUrl: {
-    // Todo: Add as required when backend & frontend are ready for handling avatars
+  avatarUrl: {  // Avatar image url
+    type: String
+  },
+  coverUrl: { // Cover image url
     type: String
   },
   bio: {
