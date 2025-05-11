@@ -69,7 +69,7 @@ exports.loginUser = async (req, res, next) => {
             email: userEmail,
             role
           },
-          csrfToken
+          csrfToken: csrfToken
         });
 
       } else {

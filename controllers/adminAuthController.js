@@ -23,7 +23,10 @@ async function adminLogin(req, res) {
 
   setAuthCookies(res, token);
 
-  return res.status(200).json({ message: 'Admin logged in.' }, csrfToken);
+  return res.status(200).json({
+    message: 'Admin logged in.',
+    csrfToken: csrfToken
+  });
 }
 
 module.exports = { adminLogin };
