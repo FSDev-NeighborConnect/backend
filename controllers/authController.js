@@ -65,11 +65,11 @@ exports.loginUser = async (req, res, next) => {
         res.status(200).json({
           message: "Login successful",
           user: {
-            id,
-            email: userEmail,
-            role
+            id: userExists.id,
+            email: userExists.email,
+            role: userExists.role
           },
-          csrfToken
+          csrfToken: csrfToken
         });
 
       } else {
