@@ -66,10 +66,27 @@ const adminDeletePost = async (req, res, next) => {
   }
 };
 
+const adminUpdatePost = async (req, res) => {
+  const { postId } = req.params.id;
+  const updates = req.body;
+
+  try {
+    const updatePost = await Post.findByIdAndUpdate(postId, updates, { new: true });
+
+    if (!updatePost) {
+      return res.status(404).json({ message: 'Post not found!' });
+    }
+
+    return res.status(200).json({ message: 'Post updated' }, updatePost);
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to update post!', error: error.message });
+  }
+}
 
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
   getAllUsers,
-  adminDeletePost
+  adminDeletePost,
+  adminUpdatePost
 };
