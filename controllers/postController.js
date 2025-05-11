@@ -90,5 +90,21 @@ const deletePost = async (req, res) => {
   }
 };
 
+const getUserPosts = async (req, res) => {
+  const { userId } = req.params;
 
-module.exports = { getAllPosts, deletePost, getPostsByZip, createPost, getPostByID };
+  try {
+    const posts = await Post.find({ createdBy: userId });
+
+    if (!posts.length) {
+      return res.status(404).json({ message: 'No posts found' });
+    }
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to retrieve posts', error: err.message });
+  }
+}
+
+
+module.exports = { getAllPosts, deletePost, getPostsByZip, createPost, getPostByID, getUserPosts };

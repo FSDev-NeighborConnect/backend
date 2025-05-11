@@ -1,18 +1,24 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
-function generateToken(user) {
-  return jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: '1d' }
-  );
+// Generate random CSRF token
+function generateCsrfToken() {
+  return crypto.randomBytes(32).toString('hex');
 }
 
-// One function for both JWT & CSRF cookies, latter will be added
-function setAuthCookies(res, user) {
-  const token = generateToken(user);
+function createAuthPayload(user) {
+  const csrfToken = generateCsrfToken();
 
-  // JWT cookie (httpOnly)
+  const token = jwt.sign(
+    { id: user._id, role: user.role, csrfToken },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  return { token, csrfToken };
+}
+
+function setAuthCookies(res, token) {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',  // sends cookie only over https when server is deployed
@@ -31,4 +37,4 @@ function clearAuthCookies(res) {
   });
 }
 
-module.exports = { setAuthCookies, clearAuthCookies };
+module.exports = { setAuthCookies, clearAuthCookies, createAuthPayload };
