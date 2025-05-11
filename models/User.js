@@ -31,11 +31,13 @@ const userSchema = new mongoose.Schema({
     type: String, // String due to + & leading zeros
     required: true
   },
-  avatarUrl: {  // Avatar image url
-    type: String
+  avatar: {  // Avatar image url
+    url: String,
+    public_id: String
   },
-  coverUrl: { // Cover image url
-    type: String
+  cover: { // Cover image url
+    url: String,
+    public_id: String
   },
   bio: {
     type: String,

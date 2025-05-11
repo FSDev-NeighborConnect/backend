@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const { clearAuthCookies } = require('../services/authServices');
+const uploadImageToCloudinary = require('../utils/cloudinaryUploader');
 
 const getUserById = async (req, res, next) => {
     try {
@@ -65,11 +66,22 @@ async function deleteUser(req, res) {
 
 const uploadAvatarImage = async (req, res) => {
     try {
-        const imageUrl = req.file.path;
         const userId = req.user.id;
+        const folder = `users/${userId}/avatars`;
 
-        await User.findByIdAndUpdate(userId, { avatarUrl: imageUrl });
-        res.status(200).json({ message: 'Avatar uploaded', url: imageUrl });
+        const result = await uploadImageToCloudinary(req.file.buffer, folder, [
+            { width: 300, height: 300, crop: 'fill' }
+        ]);
+
+
+        await User.findByIdAndUpdate(userId, {
+            avatar: {
+                url: result.secure_url,
+                public_id: result.public_id
+            }
+        });
+
+        res.status(200).json({ message: 'Avatar uploaded', imageUrl: result.secure_url });
     } catch (err) {
         res.status(500).json({ error: 'Avatar upload failed' });
     }
@@ -77,11 +89,22 @@ const uploadAvatarImage = async (req, res) => {
 
 const uploadCoverImage = async (req, res) => {
     try {
-        const imageUrl = req.file.path;
         const userId = req.user.id;
+        const folder = `users/${userId}/covers`;
 
-        await User.findByIdAndUpdate(userId, { coverUrl: imageUrl });
-        res.status(200).json({ message: 'Cover uploaded', url: imageUrl });
+        const result = await uploadImageToCloudinary(req.file.buffer, folder, [
+            { width: 1000, height: 300, crop: 'fill' }
+        ]);
+
+
+        await User.findByIdAndUpdate(userId, {
+            cover: {
+                url: result.secure_url,
+                public_id: result.public_id
+            }
+        });
+
+        res.status(200).json({ message: 'Cover uploaded', imageUrl: result.secure_url });
     } catch (err) {
         res.status(500).json({ error: 'Cover upload failed' });
     }

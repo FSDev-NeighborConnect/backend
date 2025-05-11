@@ -1,7 +1,7 @@
 const multer = require('multer');
-const { avatarStorage, coverStorage } = require('../config/cloudinaryStorage');
+const path = require('path');
 
-const uploadAvatar = multer({ storage: avatarStorage });
-const uploadCover = multer({ storage: coverStorage });
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-module.exports = { uploadAvatar, uploadCover };
+module.exports = upload;
