@@ -6,7 +6,7 @@ const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { requireAdmin } = require('../middleware/adminMiddleware');
 const { validateUserId, validateGetAllUsers, validateZipCode } = require('../middleware/validator');
-const { uploadAvatar, uploadCover } = require('../middleware/upload');
+const upload = require('../middleware/upload');
 const { uploadAvatarImage, uploadCoverImage } = require('../controllers/userController');
 
 router.use(authenticate);
@@ -20,7 +20,7 @@ router.get('/user/:id', validateUserId, getUserById);
 router.put('/:id', updateUser);
 router.get('/zip/:zip', validateZipCode, getUsersByZip);
 router.delete('/:id', deleteUser);
-router.post('/upload-avatar', authenticate, uploadAvatar.single('avatar'), uploadAvatarImage);
-router.post('/upload-cover', authenticate, uploadCover.single('cover'), uploadCoverImage);
+router.post('/upload-avatar', authenticate, upload.single('avatar'), uploadAvatarImage);
+router.post('/upload-cover', authenticate, upload.single('cover'), uploadCoverImage);
 
 module.exports = router;
