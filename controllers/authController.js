@@ -13,7 +13,6 @@ exports.registerUser = async (req, res, next) => {
     phone,
     avatarUrl,
     bio,
-    role,
     hobbies
   } = req.body;
 
@@ -34,7 +33,6 @@ exports.registerUser = async (req, res, next) => {
       phone,
       avatarUrl, //optional
       bio, //optional
-      role,
       hobbies //optional
     });
     // Saving the new user data to DB.
