@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getUserById, updateUser, getUsersByZip, deleteUser } = require('../controllers/userController');
+const {
+  getUserById,
+  updateUser,
+  getUsersByZip,
+  deleteUser,
+  getCurrentUser
+} = require('../controllers/userController');
 const { getAllUsers } = require('../controllers/adminController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
@@ -20,7 +26,8 @@ router.get('/user/:id', validateUserId, getUserById);
 router.put('/:id', updateUser);
 router.get('/zip/:zip', validateZipCode, getUsersByZip);
 router.delete('/:id', deleteUser);
-router.post('/upload-avatar', authenticate, upload.single('avatar'), uploadAvatarImage);
-router.post('/upload-cover', authenticate, upload.single('cover'), uploadCoverImage);
+router.post('/upload-avatar', upload.single('avatar'), uploadAvatarImage);
+router.post('/upload-cover', upload.single('cover'), uploadCoverImage);
+router.get('/currentUser', getCurrentUser);
 
 module.exports = router;
