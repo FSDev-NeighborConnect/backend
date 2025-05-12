@@ -1,11 +1,11 @@
 const User = require('../models/User');
 const { comparePasswords } = require('../utils/hash');
-const { setAuthCookies } = require('../services/authServices');
+const { setAuthCookies, createAuthPayload } = require('../services/authServices');
 
 async function adminLogin(req, res) {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select('+password');
   if (!user) {
     return res.status(401).json({ message: 'Invalid credentials!' });
   }
@@ -19,9 +19,14 @@ async function adminLogin(req, res) {
     return res.status(401).json({ message: 'Invalid credentials!' });
   }
 
-  setAuthCookies(res, user);
+  const { token, csrfToken } = createAuthPayload(user);
 
-  return res.status(200).json({ message: 'Admin logged in.' });
+  setAuthCookies(res, token);
+
+  return res.status(200).json({
+    message: 'Admin logged in.',
+    csrfToken: csrfToken
+  });
 }
 
 module.exports = { adminLogin };

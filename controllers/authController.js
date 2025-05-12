@@ -1,6 +1,6 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User');
-const { setAuthCookies } = require('../services/authServices');
+const { setAuthCookies, createAuthPayload } = require('../services/authServices');
 const { hashPassword, comparePasswords } = require('../utils/hash');
 
 exports.registerUser = async (req, res, next) => {
@@ -52,21 +52,24 @@ exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     // Find user by email
-    const userExists = await User.findOne({ email: email.toLowerCase() });
+    const userExists = await User.findOne({ email: email.toLowerCase() }).select('+password');
 
     if (userExists) {
       const pwdMatch = await comparePasswords(password, userExists.password);
 
       if (pwdMatch) {
-        setAuthCookies(userExists);
+        const { token, csrfToken } = createAuthPayload(userExists);
+
+        setAuthCookies(res, token);
 
         res.status(200).json({
           message: "Login successful",
           user: {
-            id,
-            email: userEmail,
-            role
-          }
+            id: userExists.id,
+            email: userExists.email,
+            role: userExists.role
+          },
+          csrfToken: csrfToken
         });
 
       } else {
