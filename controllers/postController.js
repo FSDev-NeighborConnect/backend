@@ -13,7 +13,7 @@ const getAllPosts = async (req, res) => {
 
 const getPostsByZip = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userID) //to get the current user from DB from data recd. via authenticate next
+    const user = await User.findById(req.user.id) //to get the current user from DB from data recd. via authenticate next
     const postalCode = user.postalCode;
 
     const posts = await Post.find({ postalCode }).populate('createdBy', 'name');
@@ -94,7 +94,7 @@ const deletePost = async (req, res) => {
 };
 
 const getUserPosts = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.params.id;
 
   try {
     const posts = await Post.find({ createdBy: userId });

@@ -1,10 +1,6 @@
-const uploadImageToCloudinary = jest.fn(() =>
-  Promise.resolve({
-    secure_url: 'https://cloudinary.com/fake-image.jpg',
-    public_id: 'users/user123/avatarOrCover',
-  })
-);
-
-module.exports = {
-  uploadImageToCloudinary,
+module.exports = async function uploadImageToCloudinary(buffer, folder, transformation) {
+  return {
+    secure_url: `https://cloudinary.com/${folder}/mocked.jpg`,
+    public_id: `${folder}/mocked-public-id`,
+  };
 };

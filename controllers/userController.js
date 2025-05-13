@@ -50,18 +50,21 @@ async function getUsersByZip(req, res) {
 }
 
 async function deleteUser(req, res) {
-    const { userId } = req.params;
-
-    if (req.user.id !== userId) {
-        return res.status(403).json({ message: 'You can only delete your own profile, not someone else!' });
-    }
+    const userId = req.params.id;
 
     try {
-        const user = await User.findByIdAndDelete(userId);
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }
 
+        if (req.user.id !== user.id.toString()) {
+            return res.status(403).json({
+                message: 'You can only delete your own profile, not someone else!',
+            });
+        }
+
+        await user.deleteOne();
         clearAuthCookies(res);  // Deletes auth cookie & token, logs user out
         return res.status(200).json({ message: `User ${user.name} has been deleted.` });
     } catch (error) {
