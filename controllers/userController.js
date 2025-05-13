@@ -51,6 +51,11 @@ async function getUsersByZip(req, res) {
 
 async function deleteUser(req, res) {
     const { userId } = req.params;
+
+    if (req.user.id !== userId) {
+        return res.status(403).json({ message: 'You can only delete your own profile, not someone else!' });
+    }
+
     try {
         const user = await User.findByIdAndDelete(userId);
         if (!user) {

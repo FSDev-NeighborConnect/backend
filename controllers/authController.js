@@ -11,7 +11,6 @@ exports.registerUser = async (req, res, next) => {
     streetAddress,
     postalCode,
     phone,
-    avatarUrl,
     bio,
     hobbies
   } = req.body;
@@ -31,7 +30,6 @@ exports.registerUser = async (req, res, next) => {
       streetAddress,
       postalCode,
       phone,
-      avatarUrl, //optional
       bio, //optional
       hobbies //optional
     });
