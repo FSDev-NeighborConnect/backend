@@ -34,5 +34,32 @@ const createEvent = async (req, res, next) => {
 }
 
 
-module.exports = { createEvent };
+const getPostsByZip = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userID) //to get the current user from DB from data recd. via authenticate next
+    const postalCode = user.postalCode;
 
+    const posts = await Post.find({ postalCode }).populate('createdBy', 'name');
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch posts!', error: err.message })
+  }
+};
+
+// Fetch the posts details created by particular user.
+const getEventByUserId = async (req, res, next) => {
+  try {
+    // Find event in DB using user ID received in request and populate the creator's name
+    const eventDetails = await Event.findById(req.user.id).populate('createdBy', 'name');
+    if (eventDetails) {
+      return res.status(200).json({ eventDetails });
+    } else {
+      return res.status(404).json({ message: 'No Events created by user!' })
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+module.exports = {createEvent, getEventByUserId};
