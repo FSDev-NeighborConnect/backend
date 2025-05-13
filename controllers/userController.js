@@ -57,7 +57,7 @@ async function deleteUser(req, res) {
     }
 
     try {
-        const user = User.findByIdAndDelete(userId);
+        const user = await User.findByIdAndDelete(userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found!' });
         }

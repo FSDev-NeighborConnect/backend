@@ -2,7 +2,7 @@
 const connectDb = require('./config/db');
 require('dotenv').config();
 const cors = require('cors');
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const express = require('express');
 const path = require('path');
 const { sanitizeRequest } = require('./middleware/sanitize');
@@ -11,7 +11,8 @@ const cookieParser = require('cookie-parser');
 //Addition of controllers
 const authRoutes = require('./routes/authRoutes');
 const postRoutes = require('./routes/postRoutes');
-const userRoutes = require('./routes/userRoutes')
+const userRoutes = require('./routes/userRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 
@@ -30,6 +31,7 @@ app.use(cors({
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/events', eventRoutes)
 
 app.get('/', (req, res) => {
   res.json({ message: 'Server running.' });
