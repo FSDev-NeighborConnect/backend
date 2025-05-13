@@ -1,14 +1,13 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
-const app = require('../server.js');
-const User = require('../models/User');
-const { hashPassword } = require('../utils/hash');
-const { setupTestDB, teardownTestDB, clearDB } = require('./utils/testDb');
+const server = require('../../server.js');
+const User = require('../../models/User.js');
+const { hashPassword } = require('../../utils/hash.js');
+const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
 
-describe('Auth Routes', () => {
+describe('Auth Routes (integration)', () => {
   describe('POST /api/signup', () => {
     it('should create new user and return 201', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/signup')
         .send({
           name: 'Test123',
@@ -38,7 +37,7 @@ describe('Auth Routes', () => {
     });
 
     it('should login a user and return a cookie', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/login')
         .send({ email: 'test@example.com', password: 'mypassword' });
 
@@ -60,7 +59,7 @@ describe('Auth Routes', () => {
     });
 
     it('should fail with wrong password', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/login')
         .send({ email: 'test@example.com', password: 'wrongpass' });
 
