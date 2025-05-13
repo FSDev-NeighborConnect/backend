@@ -44,6 +44,14 @@ const validatePostId = [
   handleValidation
 ];
 
+// To validate Post ID request
+const validateEventId = [
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid ID !'),
+
+    handleValidation
+];
 // To validate & Sanitize post creation request
 const validatePostCreation = [
   sanitizeInputFields(['title', 'description']),
@@ -117,8 +125,7 @@ const validateEventCreation = [
 const validateUserId = [
   param('id')
     .isMongoId().withMessage('Invalid user ID'),
-
-  handleValidation
+    handleValidation
 ]
 
 // To validate sign up request
@@ -195,5 +202,6 @@ module.exports = {
   validatePostId,
   validateGetAllUsers,
   validateZipCode,
+  validateEventId,
   validateEventCreation
 };
