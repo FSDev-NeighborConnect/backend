@@ -30,7 +30,6 @@ const adminDeleteUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    clearAuthCookies(res);  // Deletes auth cookie & token, logs user out
     res.status(200).json({ message: `User ${user.name} successfully deleted!` });
   } catch (err) {
     res.status(500).json({ message: 'Failed to delete user!', error: err.message });
@@ -68,7 +67,7 @@ const adminDeletePost = async (req, res, next) => {
 };
 
 const adminUpdatePost = async (req, res) => {
-  const { postId } = req.params.id;
+  const postId = req.params.id;
   const updates = req.body;
 
   try {

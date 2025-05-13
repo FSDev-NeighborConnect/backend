@@ -5,6 +5,12 @@ const uri = process.env.CONNECTION_URL
 const clientOptions = { dbName: 'FSNeighborConnect', serverApi: { version: '1', strict: true, deprecationErrors: true } };
 
 async function connectDb() {
+
+  if (process.env.NODE_ENV === 'test') {
+    console.log('[connectDb] Skipping MongoDB connection (test mode)');
+    return;
+  }
+
   try {
     await mongoose.connect(uri, clientOptions);
     await mongoose.connection.db.admin().command({ ping: 1 });
