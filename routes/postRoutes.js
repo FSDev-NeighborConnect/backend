@@ -9,6 +9,8 @@ const { validatePostId, validatePostCreation } = require('../middleware/validato
 router.use(authenticate);
 router.use(csrfProtection);
 
+
+
 // Get all posts route, authenticates user first
 router.get('/all/posts', getAllPosts);
 

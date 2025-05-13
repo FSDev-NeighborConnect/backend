@@ -33,21 +33,25 @@ const createEvent = async (req, res, next) => {
   }
 }
 
-
-const getPostsByZip = async (req, res) => {
+// Fetch the evets in a particular postal code.
+const getZipEvents = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.userID) //to get the current user from DB from data recd. via authenticate next
+    const user = await User.findById(req.user.id)
     const postalCode = user.postalCode;
-
-    const posts = await Post.find({ postalCode }).populate('createdBy', 'name');
-    res.status(200).json(posts);
+    // Find event in DB using postal code  and populate the creator's name
+    const events = await Event.find({postalCode}).populate('createdBy', 'name');
+    if (events) {
+      return res.status(200).json({ events });
+    } else {
+      return res.status(404).json({ message: 'No Events found in your area!' })
+    }
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch posts!', error: err.message })
+    next(err);
   }
-};
+}
 
 // Fetch the posts details created by particular user.
-const getEventByUserId = async (req, res, next) => {
+const getUserEvents = async (req, res, next) => {
   try {
     // Find event in DB using user ID received in request and populate the creator's name
     const eventDetails = await Event.findById(req.user.id).populate('createdBy', 'name');
@@ -61,6 +65,60 @@ const getEventByUserId = async (req, res, next) => {
   }
 }
 
+const getEventByID = async (req, res, next) => {
+  try {
+    const eventId = req.params.id;
+    // Find post in DB using post ID received in request and populate the creator's name
+    const eventDetails = await Event.findById(eventId).populate('createdBy', 'name');
+    if (eventDetails) {
+      return res.status(200).json({ eventDetails });
+    } else {
+      return res.status(404).json({ message: 'Page not found' })
+    }
 
-module.exports = {createEvent, getEventByUserId};
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+const getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find().populate('createdBy', 'name');  // populates createdBy with User but limits to name only
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch events!', error: err.message });
+  }
+};
+
+const deleteEvent = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const event = await Event.findById(id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You are not the owner of this post!' });
+    }
+
+    await event.deleteOne();
+
+    res.status(200).json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete event', error: err.message });
+  }
+};
+
+module.exports = {
+    createEvent, 
+    getUserEvents, 
+    getZipEvents, 
+    getEventByID, 
+    getAllEvents,
+    deleteEvent
+};
 
