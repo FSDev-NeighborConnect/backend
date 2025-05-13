@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
 const { clearAuthCookies } = require('../services/authServices');
+const { hashPassword } = require('../utils/hash');
 
 
 // PUT /api/admin/users/:id
@@ -83,10 +84,51 @@ const adminUpdatePost = async (req, res) => {
   }
 }
 
+const adminCreateUser = async (req, res, next) => {
+  const { name,
+    email,
+    password,
+    streetAddress,
+    postalCode,
+    phone,
+    avatarUrl,
+    bio,
+    role,
+    hobbies
+  } = req.body;
+
+  try {
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists." });
+    }
+
+    const hashedPassword = await hashPassword(password);
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      streetAddress,
+      postalCode,
+      phone,
+      avatarUrl,
+      bio,
+      role,
+      hobbies
+    });
+
+    await newUser.save();
+    return res.status(201).json({ message: "User registered successfully." });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
   getAllUsers,
   adminDeletePost,
-  adminUpdatePost
+  adminUpdatePost,
+  adminCreateUser
 };

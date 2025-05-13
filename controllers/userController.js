@@ -110,5 +110,19 @@ const uploadCoverImage = async (req, res) => {
     }
 };
 
+const getCurrentUser = (req, res) => {
+    res.status(200).json({
+        id: req.user.id,
+        role: req.user.role
+    });
+};
 
-module.exports = { getUserById, updateUser, getUsersByZip, deleteUser, uploadAvatarImage, uploadCoverImage };
+module.exports = {
+    getUserById,
+    updateUser,
+    getUsersByZip,
+    deleteUser,
+    uploadAvatarImage,
+    uploadCoverImage,
+    getCurrentUser
+};
