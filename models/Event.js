@@ -65,6 +65,11 @@ const eventSchema = new mongoose.Schema({
     required: true
   },
 
+  rsvp: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
+
 }, {
   timestamps: true
 });
