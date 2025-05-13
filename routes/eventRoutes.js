@@ -1,31 +1,32 @@
 const express = require('express');
 const router = express.Router();
 
-const { createEvent } = require('../controllers/eventController');
+const { createEvent, getZipEvents, getUserEvents, getEventByID, deleteEvent } = require('../controllers/eventController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
-const { validateEventCreation } = require('../middleware/validator');
+const { validateEventCreation, 
+    validateZipCode, 
+    validateUserId, 
+    validateEventId,
+     } = require('../middleware/validator');
 
 
 router.use(authenticate);
 router.use(csrfProtection);
 
-// ........................
+
 //Create a new Event
-router.post('/event', validateEventCreation, createEvent)
-// ...................................................
-/*
-// Get all posts route, authenticates user first
-router.get('/all/posts', getAllPosts);
+router.post('/event', validateEventCreation, createEvent);
+// Get events list based on zip code.
+router.get('/zip', validateZipCode, getZipEvents);
+// Get the event created
+router.get('/user/:id', validateUserId, getUserEvents);
+// Visit a Event 
+router.get('/:id', validateEventId, getEventByID)
 
-//Get posts by zip
-router.get('/zip', getPostsByZip);
-// Visit a post 
-router.get('/:id', validatePostId, getPostByID)
 
-router.delete('/:id', deletePost);
+// To delete event based on event id
+router.delete('/:id', validateEventId, deleteEvent);
 
-router.get('/user/:id', getUserPosts);
-*/
 
 module.exports = router;
