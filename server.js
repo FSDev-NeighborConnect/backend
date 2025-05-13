@@ -48,8 +48,11 @@ app.use('/api', authRoutes); // routes start with /api
 // registers the function into Express’s internal middleware system.
 app.use(errorHandler);
 
-connectDb().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+if (process.env.NODE_ENV !== 'test') {
+  connectDb().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
   });
-});
+}
+module.exports = app;
