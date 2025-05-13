@@ -68,7 +68,7 @@ const adminDeletePost = async (req, res, next) => {
 };
 
 const adminUpdatePost = async (req, res) => {
-  const { postId } = req.params.id;
+  const postId = req.params.id;
   const updates = req.body;
 
   try {
