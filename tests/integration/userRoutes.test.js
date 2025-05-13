@@ -8,13 +8,13 @@ const {
   teardownTestDB,
   clearDB,
 } = require('../utils/testDb.js');
-const { createTestUser } = require('../utils/testUser');
-const { loginHelper } = require('../utils/testAuth');
+const { createTestUser } = require('../utils/testUser.js');
+const { loginHelper } = require('../utils/testAuth.js');
 
 // mock Cloudinary so upload hits no external API
 jest.mock(
   '../../utils/cloudinaryUploader',
-  () => require('../utils/mockCloudinaryUploader')
+  () => require('../utils/mockCloudinaryUploader.js')
 );
 
 describe('User Routes (integration)', () => {
@@ -30,6 +30,7 @@ describe('User Routes (integration)', () => {
     user = await createTestUser();
     // 2) Log in to obtain auth cookie + csrfToken
     ({ authCookie, csrfToken } = await loginHelper(user.email, 'Password123!'));
+    // console.log('[TEST] logged in as:', user.id);
   });
   afterAll(teardownTestDB);
 
@@ -110,7 +111,7 @@ describe('User Routes (integration)', () => {
       expect(res.status).toBe(200);
       expect(res.body.imageUrl).toMatch(/^https?:\/\//);
 
-      const updated = await User.findById(userId);
+      const updated = await User.findById(user.id);
       expect(updated.avatar.url).toBe(res.body.imageUrl);
     });
   });
@@ -124,13 +125,84 @@ describe('User Routes (integration)', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
-        id: userId,
+        id: user.id,
         role: user.role,
       });
     });
   });
 
   describe('DELETE /api/users/:id', () => {
-    it('deletes the ')
-  })
+    it('allows the user to delete themselves', async () => {
+      const res = await request(server)
+        .delete(`/api/users/${user.id}`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toMatch(/deleted/i);
+
+      const deleted = await User.findById(user.id);
+      expect(deleted).toBeNull();
+    });
+
+    it('blocks user from deleting someone else', async () => {
+      const otherUser = await createTestUser({ email: 'other@test.com' });
+
+      const res = await request(server)
+        .delete(`/api/users/${otherUser.id}`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('returns 404 if user does not exist', async () => {
+      const res = await request(server)
+        .delete('/api/users/999999999999999999999999')
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(404);
+    });
+  });
+
+  describe('POST /api/users/upload-avatar', () => {
+    it('uploads an avatar and updates user record', async () => {
+      const res = await request(server)
+        .post('/api/users/upload-avatar')
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken)
+        .attach('avatar', Buffer.from('fake-image'), 'avatar.jpg');
+
+      expect(res.status).toBe(200);
+      expect(res.body.imageUrl).toMatch(/^https?:\/\//);
+
+      const updated = await User.findById(user.id);
+      expect(updated.avatar).toMatchObject({
+        url: res.body.imageUrl,
+        public_id: expect.any(String),
+      });
+    });
+  });
+
+  describe('POST /api/users/upload-cover', () => {
+    it('uploads a cover image and updates user record', async () => {
+      const res = await request(server)
+        .post('/api/users/upload-cover')
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken)
+        .attach('cover', Buffer.from('fake-image'), 'cover.jpg');
+
+      expect(res.status).toBe(200);
+      expect(res.body.imageUrl).toMatch(/^https?:\/\//);
+
+      const updated = await User.findById(user.id);
+      expect(updated.cover).toMatchObject({
+        url: res.body.imageUrl,
+        public_id: expect.any(String),
+      });
+    });
+  });
+
+
 });

@@ -10,13 +10,17 @@ describe('Auth Routes (integration)', () => {
       const res = await request(server)
         .post('/api/signup')
         .send({
-          name: 'Test123',
+          name: 'Tester Testingsson',
           email: 'test@example.com',
           password: 'Test12345678!',
-          streetAddress: 'Testingvägen 1',
+          streetAddress: 'Testingvagen 1',
           postalCode: '12345',
           phone: '000000'
         });
+
+
+      // Uncomment to debug potential signup problems via response object
+      // console.log('[SIGNUP TEST] Response:', res.statusCode, res.body);
 
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty('message', 'User registered successfully.');
