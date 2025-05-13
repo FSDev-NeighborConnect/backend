@@ -8,13 +8,13 @@ const {
   teardownTestDB,
   clearDB,
 } = require('../utils/testDb.js');
-const { createTestUser } = require('../utils/testUser');
-const { loginHelper } = require('../utils/testAuth');
+const { createTestUser } = require('../utils/testUser.js');
+const { loginHelper } = require('../utils/testAuth.js');
 
 // mock Cloudinary so upload hits no external API
 jest.mock(
   '../../utils/cloudinaryUploader',
-  () => require('../utils/mockCloudinaryUploader')
+  () => require('../utils/mockCloudinaryUploader.js')
 );
 
 describe('User Routes (integration)', () => {

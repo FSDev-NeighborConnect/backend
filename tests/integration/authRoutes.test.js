@@ -19,7 +19,8 @@ describe('Auth Routes (integration)', () => {
         });
 
 
-      console.log('[SIGNUP TEST] Response:', res.statusCode, res.body);
+      // Uncomment to debug potential signup problems via response object
+      // console.log('[SIGNUP TEST] Response:', res.statusCode, res.body);
 
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty('message', 'User registered successfully.');
