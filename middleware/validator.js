@@ -71,7 +71,6 @@ const validateSignUp = [
     .isLength({ min: 4 }).withMessage('Name must be at least 4 characters')
     .trim()
     .matches(/^[\p{L}\p{M} \-']+$/u).withMessage('Name must contain only letters, spaces, hyphens or apostrophes.'),
-    
 
   check('email')
     .notEmpty().withMessage('Email is required')
