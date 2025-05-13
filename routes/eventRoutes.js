@@ -11,7 +11,7 @@ const { validateEventCreation,
 validateGetAllUsers } = require('../middleware/validator');
 
 
-router.use(authenticate); 
+router.use(authenticate);
 router.use(csrfProtection);
 
 
