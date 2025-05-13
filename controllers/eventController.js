@@ -7,7 +7,7 @@ const createEvent = async (req, res, next) => {
     const { eventImage, title, date,
       startTime, endTime, streetAddress,
       postalCode, description, hobbies
-      } = req.body;
+    } = req.body;
 
     // Get user info from DB based on  authenticate.js. 
     // For add security in case user still have the token after deleting user.
@@ -18,7 +18,7 @@ const createEvent = async (req, res, next) => {
     const newEvent = new Event({
       eventImage, title, date,
       startTime, endTime, streetAddress,
-      postalCode, description,hobbies,
+      postalCode, description, hobbies,
       createdBy: req.user._id,
     });
 
@@ -63,4 +63,3 @@ const getEventByUserId = async (req, res, next) => {
 
 
 module.exports = {createEvent, getEventByUserId};
-
