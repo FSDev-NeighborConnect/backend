@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 
 const eventSchema = new mongoose.Schema({
   eventImage: { // Cover image url
-    url:{
-        type: String,
-        default: "https://res.cloudinary.com/dp6nzg4mn/image/upload/event_iz9q6w.webp"
+    url: {
+      type: String,
+      default: "https://res.cloudinary.com/dp6nzg4mn/image/upload/event_iz9q6w.webp"
     },
 
     public_id: {
-        type: String,
-        default: "event_iz9q6w"
+      type: String,
+      default: "event_iz9q6w"
     }
   },
-    
+
   title: {
     type: String,
     required: true,
@@ -20,24 +20,24 @@ const eventSchema = new mongoose.Schema({
     minlength: 5 // Ensure title is at least 5 characters long
   },
 
-  date:{
+  date: {
     type: Date,
     required: true,
   },
 
   startTime: {
-    type : Date,
+    type: Date,
     required: true
   },
 
-  endTime:{
-    type : Date,
+  endTime: {
+    type: Date,
     required: true,
     validate: {
-        function (value) {
-            return value > this.startTime;   
-        },
-        message: 'End time must be after the start time.'
+      validator: function (value) {
+        return value > this.startTime;
+      },
+      message: 'End time must be after the start time.'
     }
   },
 
@@ -50,21 +50,21 @@ const eventSchema = new mongoose.Schema({
     type: String, // String as postal code is allowed to have alphabets
     required: true
   },
-  
+
   description: {
     type: String,
     required: true,
     minlength: 10
   },
 
-    hobbies: [String],  // Could be used as category at frontend. So, same as hobbies
-  
-    createdBy: {
+  hobbies: [String],  // Could be used as category at frontend. So, same as hobbies
+
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  
+
 }, {
   timestamps: true
 });

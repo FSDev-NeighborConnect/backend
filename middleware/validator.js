@@ -1,7 +1,7 @@
 // To Validate and sanitize input
 const { sanitizeInputFields } = require('./sanitize')
 const { check, param } = require("express-validator");
-const { handleValidation } = require ("./handleValidation")
+const handleValidation = require("./handleValidation")
 
 // Validate the get request for all user to prevent injections
 const validateGetAllUsers = (req, res, next) => {
@@ -32,7 +32,7 @@ const validateLogIn = [
     .withMessage('Password should be of minimum 8 chars.')
     .trim(),
 
-    handleValidation
+  handleValidation
 ];
 
 // To validate Post ID request
@@ -41,7 +41,7 @@ const validatePostId = [
     .isMongoId()
     .withMessage('Invalid ID !'),
 
-    handleValidation
+  handleValidation
 ];
 
 // To validate & Sanitize post creation request
@@ -57,9 +57,9 @@ const validatePostCreation = [
 
   check('status')
     .notEmpty()
-    .isIn('open', 'in progress', 'closed').withMessage('Must be open, in progress or closed'),
+    .isIn(['open', 'in progress', 'closed']).withMessage('Must be open, in progress or closed'),
 
-    handleValidation
+  handleValidation
 ];
 
 // To validate & Sanitize post creation request
@@ -73,13 +73,13 @@ const validateEventCreation = [
 
   check('date')
     .notEmpty().withMessage('Date is required')
-    .isISO8601().withMessage('Date must be a valid ISO date'),  
+    .isISO8601().withMessage('Date must be a valid ISO date'),
 
   check('startTime')
     .notEmpty().withMessage('Start time is required')
     .isISO8601().withMessage('Start time must be a valid ISO date/time'),
 
-   check('endTime')
+  check('endTime')
     .notEmpty().withMessage('End time is required')
     .isISO8601().withMessage('End time must be a valid ISO date/time')
     .custom((endTime, { req }) => {
@@ -89,14 +89,14 @@ const validateEventCreation = [
         throw new Error('End time must be after start time');
       }
       return true;
-    }),  
-    check('streetAddress')
+    }),
+  check('streetAddress')
     .trim()
     .notEmpty().withMessage('Street address is required'),
 
   check('postalCode')
     .trim()
-    .isPostalCode ('any')
+    .isPostalCode('any')
     .notEmpty().withMessage('Postal code is required'),
 
   check('description')
@@ -109,7 +109,7 @@ const validateEventCreation = [
     .isArray().withMessage('Hobbies must be an array')
     .custom((arr) => arr.every(item => typeof item === 'string')).withMessage('Each hobby must be a string'),
 
-    handleValidation
+  handleValidation
 ];
 
 
@@ -118,7 +118,7 @@ const validateUserId = [
   param('id')
     .isMongoId().withMessage('Invalid user ID'),
 
-    handleValidation
+  handleValidation
 ]
 
 // To validate sign up request
@@ -147,10 +147,10 @@ const validateSignUp = [
     .isLength({ min: 5 }).withMessage('Address must be at least 5 characters')
     .matches(/^[0-9\s-]{4,10}$/).withMessage('Invalid Address.'),
 
-   check('postalCode')
+  check('postalCode')
     .notEmpty()
     .isPostalCode('any')
-    .withMessage('Postal code is required'),  
+    .withMessage('Postal code is required'),
 
   check('phone')
     .notEmpty().withMessage('Phone number is required')
@@ -176,15 +176,15 @@ const validateSignUp = [
     .optional()
     .isArray().withMessage('Hobbies must be an array')
     .custom((arr) => arr.every(item => typeof item === 'string')).withMessage('Each hobby must be a string'),
-    
-    handleValidation
+
+  handleValidation
 ];
 
 const validateZipCode = [
   param('zip')
     .isPostalCode('any')
     .withMessage('Invalid postal code'),
-    handleValidation
+  handleValidation
 ];
 
 module.exports = {
@@ -194,5 +194,6 @@ module.exports = {
   validatePostCreation,
   validatePostId,
   validateGetAllUsers,
-  validateZipCode
+  validateZipCode,
+  validateEventCreation
 };
