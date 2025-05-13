@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const { createEvent, getZipEvents, getUserEvents, getEventByID, getAllEvents, deleteEvent } = require('../controllers/eventController');
+const { createEvent, getZipEvents, getUserEvents, getEventByID, deleteEvent } = require('../controllers/eventController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { validateEventCreation, 
     validateZipCode, 
     validateUserId, 
     validateEventId,
-validateGetAllUsers } = require('../middleware/validator');
+     } = require('../middleware/validator');
 
 
 router.use(authenticate);
@@ -24,10 +24,9 @@ router.get('/user/:id', validateUserId, getUserEvents);
 // Visit a Event 
 router.get('/:id', validateEventId, getEventByID)
 
-// Get all events route, authenticates user first
-router.get('/all/events', validateGetAllUsers, getAllEvents);
 
 // To delete event based on event id
 router.delete('/:id', validateEventId, deleteEvent);
 
 
+module.exports = router;

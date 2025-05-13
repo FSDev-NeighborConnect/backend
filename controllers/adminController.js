@@ -123,11 +123,31 @@ const adminCreateUser = async (req, res, next) => {
   }
 };
 
+const getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().populate('createdBy', 'name');  // populates createdBy with User but limits to name only
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch posts!', error: err.message });
+  }
+};
+
+const getAllEvents = async (req, res) => {
+  try {
+    const events = await Event.find().populate('createdBy', 'name');  // populates createdBy with User but limits to name only
+    res.status(200).json(events);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch events!', error: err.message });
+  }
+};
+
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
   getAllUsers,
   adminDeletePost,
   adminUpdatePost,
-  adminCreateUser
+  adminCreateUser,
+  getAllEvents,
+  getAllPosts
 };

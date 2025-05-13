@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
+const { getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { validatePostId, validatePostCreation } = require('../middleware/validator');
@@ -11,8 +11,7 @@ router.use(csrfProtection);
 
 
 
-// Get all posts route, authenticates user first
-router.get('/all/posts', getAllPosts);
+
 
 //Get posts by zip
 router.get('/zip', getPostsByZip);
