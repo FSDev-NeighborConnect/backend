@@ -50,7 +50,7 @@ const getZipEvents = async (req, res, next) => {
   }
 }
 
-// Fetch the posts details created by particular user.
+// Fetch the Event details created by particular user.
 const getUserEvents = async (req, res, next) => {
   try {
     // Find event in DB using user ID received in request and populate the creator's name
@@ -68,7 +68,7 @@ const getUserEvents = async (req, res, next) => {
 const getEventByID = async (req, res, next) => {
   try {
     const eventId = req.params.id;
-    // Find post in DB using post ID received in request and populate the creator's name
+    // Find event in DB using event ID received in request and populate the creator's name
     const eventDetails = await Event.findById(eventId).populate('createdBy', 'name');
     if (eventDetails) {
       return res.status(200).json({ eventDetails });
@@ -102,7 +102,7 @@ const deleteEvent = async (req, res) => {
     }
 
     if (event.createdBy.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'You are not the owner of this post!' });
+      return res.status(403).json({ message: 'You are not the owner of this event!' });
     }
 
     await event.deleteOne();
