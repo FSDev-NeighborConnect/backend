@@ -30,7 +30,7 @@ describe('User Routes (integration)', () => {
     user = await createTestUser();
     // 2) Log in to obtain auth cookie + csrfToken
     ({ authCookie, csrfToken } = await loginHelper(user.email, 'Password123!'));
-    console.log('[TEST] logged in as:', user.id);
+    // console.log('[TEST] logged in as:', user.id);
   });
   afterAll(teardownTestDB);
 
@@ -111,7 +111,7 @@ describe('User Routes (integration)', () => {
       expect(res.status).toBe(200);
       expect(res.body.imageUrl).toMatch(/^https?:\/\//);
 
-      const updated = await User.findById(userId);
+      const updated = await User.findById(user.id);
       expect(updated.avatar.url).toBe(res.body.imageUrl);
     });
   });

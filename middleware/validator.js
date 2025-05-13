@@ -145,7 +145,7 @@ const validateSignUp = [
   check('streetAddress')
     .notEmpty().withMessage('Street address is required')
     .isLength({ min: 5 }).withMessage('Address must be at least 5 characters')
-    .matches(/^[0-9\s-]{4,10}$/).withMessage('Invalid Address.'),
+    .matches(/^[\p{L}\p{N}\s,'-]{5,100}$/u).withMessage('Invalid Address.'),
 
   check('postalCode')
     .notEmpty()
