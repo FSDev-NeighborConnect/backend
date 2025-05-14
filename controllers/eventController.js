@@ -82,14 +82,7 @@ const getEventByID = async (req, res, next) => {
 }
 
 
-const getAllEvents = async (req, res) => {
-  try {
-    const events = await Event.find().populate('createdBy', 'name');  // populates createdBy with User but limits to name only
-    res.status(200).json(events);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch events!', error: err.message });
-  }
-};
+
 
 const deleteEvent = async (req, res) => {
   const { id } = req.params;
@@ -113,12 +106,47 @@ const deleteEvent = async (req, res) => {
   }
 };
 
+
+
+const rsvpToEvent = async (req, res) => {
+  const { eventId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if user has already RSVP’d
+    const alreadyRSVPed = event.rsvp.includes(userId);
+    if (alreadyRSVPed) {
+      return res.status(400).json({ message: 'You have already RSVP to this event' });
+    }
+
+    // Add user to RSVP list
+    event.rsvp.push(userId);
+    await event.save();
+
+    res.status(200).json({
+      message: 'RSVP successful',
+      totalRsvp: event.rsvp.length
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to RSVP to event' });
+  }
+};
+
+
+
+
 module.exports = {
     createEvent, 
     getUserEvents, 
     getZipEvents, 
     getEventByID, 
-    getAllEvents,
-    deleteEvent
+    deleteEvent,
+    rsvpToEvent
 };
 
