@@ -24,6 +24,8 @@ router.get('/zip/:zip', validateZipCode, getUsersByZip);
 router.delete('/:id', deleteUser);
 router.post('/upload-avatar', upload.single('avatar'), uploadAvatarImage);
 router.post('/upload-cover', upload.single('cover'), uploadCoverImage);
+router.get('/currentUser', getCurrentUser);
+
 router.get('/me', getCurrentUser);
 
 module.exports = router;
