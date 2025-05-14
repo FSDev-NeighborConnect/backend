@@ -23,8 +23,14 @@ app.use(express.json());
 app.use(sanitizeRequest); //protect from NoSQL injection by removing '$' and '.'
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_DEVPREVIEW_URL
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: allowedOrigins,
   credentials: true
 })); // Allow requests with cookies from frontend as both had different port.
 
