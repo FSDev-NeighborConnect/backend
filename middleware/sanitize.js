@@ -4,8 +4,9 @@ const sanitizeHtml = require('sanitize-html');
 function sanitizeInputFields(fields) {
   return function (req, res, next) {
     fields.forEach(field => {
-      if (req.body[field]) {
-        req.body[field] = sanitizeHtml(req.body[field], {
+      const value = req.body[field];
+      if (typeof value === 'string') {
+        req.body[field] = sanitizeHtml(value, {
           allowedTags: [],
           allowedAttributes: {},
           allowedSchemes: [],
