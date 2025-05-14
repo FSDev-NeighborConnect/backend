@@ -118,12 +118,21 @@ const uploadCoverImage = async (req, res) => {
     }
 };
 
-const getCurrentUser = (req, res) => {
-    res.status(200).json({
-        id: req.user.id,
-        role: req.user.role
-    });
-};
+const getCurrentUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user){
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({
+        id: user._id,
+        role: user.role,
+        csrfToken: req.user.csrfToken
+});
+
+    }catch (err) {
+        next(err);
+}};
 
 module.exports = {
     getUserById,
