@@ -8,7 +8,9 @@ const {
   adminUpdatePost,
   adminCreateUser,
   getAllPosts,
-  getAllEvents
+  getAllEvents,
+  adminDeleteEvent,
+  adminUpdateEvent
 } = require('../controllers/adminController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
@@ -22,8 +24,10 @@ router.post('/login', adminLogin);  // declared before middleware
 router.use(authenticate, csrfProtection, requireAdmin);
 
 router.get('/all/users', getAllUsers);
+router.put('/events/:id', adminUpdateEvent);
 router.put('/users/:id', adminUpdateUser);
 router.put('/posts/:id', adminUpdatePost);
+router.delete('/events/:id', adminDeleteEvent);
 router.delete('/users/:id', adminDeleteUser);
 router.delete('/posts/:id', validatePostId, adminDeletePost);
 router.post('/users/create', adminCreateUser);

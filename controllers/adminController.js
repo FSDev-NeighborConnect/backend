@@ -142,6 +142,38 @@ const getAllEvents = async (req, res) => {
   }
 };
 
+const adminDeleteEvent = async (req, res, next) => {
+  try {
+    const eventId = req.params.id;
+
+    const deleteEvent = await Event.findByIdAndDelete(eventId);
+
+    if (deleteEvent) {
+      return res.status(200).json({ message: 'Event deleted successfully.' });
+    } else {
+      return res.status(404).json({ message: 'Event not found.' });
+    };
+  } catch (err) {
+    next(err);
+  };
+};
+
+const adminUpdateEvent = async (req, res) => {
+  const eventId = req.params.id;
+  const updates = req.body;
+
+  try {
+    const updateEvent = await Event.findByIdAndUpdate(eventId, updates, { new: true });
+
+    if (!updateEvent) {
+      return res.status(404).json({ message: 'Event not found!' });
+    };
+    return res.status(200).json({ message: 'Event updated' }, updateEvent);
+  } catch (err) {
+    next(err);
+  };
+};
+
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
@@ -150,5 +182,7 @@ module.exports = {
   adminUpdatePost,
   adminCreateUser,
   getAllEvents,
-  getAllPosts
+  getAllPosts,
+  adminDeleteEvent,
+  adminUpdateEvent
 };
