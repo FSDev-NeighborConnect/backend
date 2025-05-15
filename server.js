@@ -17,6 +17,7 @@ const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+// app.set('trust proxy', true);
 
 //Middleware
 app.use(express.json());
