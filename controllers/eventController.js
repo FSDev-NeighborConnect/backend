@@ -19,7 +19,7 @@ const createEvent = async (req, res, next) => {
       eventImage, title, date,
       startTime, endTime, streetAddress,
       postalCode, description, hobbies,
-      createdBy: req.user._id,
+      createdBy: req.user.id,
     });
 
     await newEvent.save();
@@ -53,9 +53,11 @@ const getZipEvents = async (req, res, next) => {
 // Fetch the Event details created by particular user.
 const getUserEvents = async (req, res, next) => {
   try {
-    // Find event in DB using user ID received in request and populate the creator's name
-    const eventDetails = await Event.findById(req.user.id).populate('createdBy', 'name');
-    if (eventDetails) {
+    const userId = req.params.id;
+     // Find event in DB using user ID received in request and populate the creator's name
+    const eventDetails = await Event.find({ createdBy: userId }).populate('createdBy', 'name');
+
+    if (eventDetails.length > 0) {
       return res.status(200).json({ eventDetails });
     } else {
       return res.status(404).json({ message: 'No Events created by user!' })

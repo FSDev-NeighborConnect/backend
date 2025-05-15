@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
+const Event = require('../models/Event');
 const { clearAuthCookies } = require('../services/authServices');
 const { hashPassword } = require('../utils/hash');
 

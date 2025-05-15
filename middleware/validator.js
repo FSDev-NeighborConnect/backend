@@ -131,7 +131,7 @@ const validateUserId = [
 // To validate sign up request
 const validateSignUp = [
   sanitizeInputFields([
-    'name', 'email', 'streetAddress', 'postalCode', 'phone', 'bio', 'hobbies'
+    'name', 'email', 'streetAddress', 'postalCode', 'bio', 'hobbies'
   ]),
   check('name').notEmpty().withMessage('Name is required')
     .isLength({ min: 4 }).withMessage('Name must be at least 4 characters')
