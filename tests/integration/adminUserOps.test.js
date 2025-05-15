@@ -4,6 +4,7 @@ const User = require('../../models/User.js');
 const { createTestUser } = require('../utils/testUser.js');
 const { loginHelper } = require('../utils/testAuth.js');
 const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
+const mongoose = require('mongoose');
 
 let authCookie, csrfToken;
 

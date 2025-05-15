@@ -127,6 +127,7 @@ describe('User Routes (integration)', () => {
       expect(res.body).toEqual({
         id: user.id,
         role: user.role,
+        csrfToken: csrfToken
       });
     });
   });
