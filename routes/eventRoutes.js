@@ -16,9 +16,9 @@ router.use(csrfProtection);
 
 
 //Create a new Event
-router.post('/event', validateEventCreation, createEvent);
+router.post('/event', createEvent);
 // Get events list based on zip code.
-router.get('/zip', validateZipCode, getZipEvents);
+router.get('/zip', getZipEvents);
 // Get the event created
 router.get('/user/:id', validateUserId, getUserEvents);
 // Visit a Event 
@@ -27,7 +27,7 @@ router.get('/:id', validateEventId, getEventByID)
 
 // To delete event based on event id
 router.delete('/:id', validateEventId, deleteEvent);
-router.post('/events/:eventId/rsvp', rsvpToEvent);
+router.post('/events/:eventId/rsvp',  rsvpToEvent);
 
 
 module.exports = router;
