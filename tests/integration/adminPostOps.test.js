@@ -5,6 +5,7 @@ const Post = require('../../models/Post.js');
 const { createTestUser } = require('../utils/testUser.js');
 const { loginHelper } = require('../utils/testAuth.js');
 const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
+const mongoose = require('mongoose');
 
 let authCookie, csrfToken;
 
@@ -38,10 +39,10 @@ describe('Admin Routes - Post Operations (integration)', () => {
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'Original',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
@@ -72,10 +73,10 @@ describe('Admin Routes - Post Operations (integration)', () => {
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'Skip CSRF',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
@@ -98,10 +99,10 @@ describe('Admin Routes - Post Operations (integration)', () => {
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'No Access',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
@@ -125,10 +126,10 @@ describe('Admin Routes - Post Operations (integration)', () => {
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'To be deleted',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
@@ -157,10 +158,10 @@ describe('Admin Routes - Post Operations (integration)', () => {
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'Skip Delete CSRF',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
@@ -175,17 +176,17 @@ describe('Admin Routes - Post Operations (integration)', () => {
     it('denies delete by non-admin user', async () => {
       const other = await createTestUser({
         email: 'notadmindel@example.com',
-        password: 'Del123!',
+        password: 'Deleter123!',
         role: 'member'
       });
-      const login = await loginHelper(other.email, 'Del123!');
+      const login = await loginHelper(other.email, 'Deleter123!');
       const admin = await User.findOne({ email: 'admin@example.com' });
       const post = await Post.create({
         title: 'No Delete Access',
-        description: 'Desc',
+        description: 'Some description here',
         category: 'Test',
         status: 'open',
-        streetAddress: '123 A St',
+        street: '123 A St',
         postalCode: '00000',
         createdBy: admin.id
       });
