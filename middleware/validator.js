@@ -50,7 +50,7 @@ const validateEventId = [
     .isMongoId()
     .withMessage('Invalid ID !'),
 
-    handleValidation
+  handleValidation
 ];
 // To validate & Sanitize post creation request
 const validatePostCreation = [
@@ -125,7 +125,7 @@ const validateEventCreation = [
 const validateUserId = [
   param('id')
     .isMongoId().withMessage('Invalid user ID'),
-    handleValidation
+  handleValidation
 ]
 
 // To validate sign up request
@@ -194,6 +194,21 @@ const validateZipCode = [
   handleValidation
 ];
 
+const validateCommentId = [
+  param('id')
+    .isMongoId().withMessage('Invalid comment ID'),
+  handleValidation
+];
+
+const validateCommentCreation = [
+  sanitizeInputFields(['content']),
+  check('content')
+    .notEmpty().withMessage('Comment content is required')
+    .isLength({ min: 1, max: 500 }).withMessage('Comment must be between 1 and 500 characters'),
+  handleValidation
+];
+
+
 module.exports = {
   validateSignUp,
   validateUserId,
@@ -203,5 +218,7 @@ module.exports = {
   validateGetAllUsers,
   validateZipCode,
   validateEventId,
-  validateEventCreation
+  validateEventCreation,
+  validateCommentId,
+  validateCommentCreation
 };
