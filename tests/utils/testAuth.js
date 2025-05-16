@@ -19,4 +19,4 @@ async function loginHelper(email, password) {
   };
 }
 
-module.exports = { loginHelper };
+module.exports = loginHelper;

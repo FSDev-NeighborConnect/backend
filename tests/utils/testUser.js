@@ -1,4 +1,4 @@
-// tests/utils/testUser.js
+// insert documentation here
 const User = require('../../models/User');
 const { hashPassword } = require('../../utils/hash');
 
@@ -19,4 +19,4 @@ async function createTestUser(overrides = {}) {
   return user;
 }
 
-module.exports = { createTestUser };
+module.exports = createTestUser;

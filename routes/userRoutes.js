@@ -5,7 +5,8 @@ const {
   updateUser,
   getUsersByZip,
   deleteUser,
-  getCurrentUser
+  getCurrentUser,
+  getAllUsers
 } = require('../controllers/userController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
@@ -25,6 +26,7 @@ router.delete('/:id', deleteUser);
 router.post('/upload-avatar', upload.single('avatar'), uploadAvatarImage);
 router.post('/upload-cover', upload.single('cover'), uploadCoverImage);
 router.get('/currentUser', getCurrentUser);
+router.get('/all', getAllUsers);
 
 router.get('/me', getCurrentUser);
 

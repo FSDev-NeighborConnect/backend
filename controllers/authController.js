@@ -1,6 +1,6 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User');
-const { setAuthCookies, createAuthPayload } = require('../services/authServices');
+const { setAuthCookies, createAuthPayload, clearAuthCookies } = require('../services/authServices');
 const { hashPassword, comparePasswords } = require('../utils/hash');
 
 exports.registerUser = async (req, res, next) => {
@@ -76,6 +76,16 @@ exports.loginUser = async (req, res, next) => {
       // This only runs if no user was found
       return res.status(400).json({ message: "Invalid credentials." });
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.logUserOut = (req, res, next) => {
+  try {
+    clearAuthCookies(res);
+    res.status(204).send();
+
   } catch (err) {
     next(err);
   }
