@@ -1,6 +1,6 @@
 // Contollers for Authentication of user routes
 const User = require('../models/User');
-const { setAuthCookies, createAuthPayload } = require('../services/authServices');
+const { setAuthCookies, createAuthPayload, clearAuthCookies } = require('../services/authServices');
 const { hashPassword, comparePasswords } = require('../utils/hash');
 
 exports.registerUser = async (req, res, next) => {
@@ -79,4 +79,15 @@ exports.loginUser = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+
+  const logUserOut = (req, res) => {
+    try {
+      clearAuthCookies(res);
+      res.status(204).send();
+
+    } catch (err) {
+      next(err);
+    }
+  };
+
 };
