@@ -37,7 +37,7 @@ const validateLogIn = [
 
 // To validate Post ID request
 const validatePostId = [
-  param('id')
+  param('postId')
     .isMongoId()
     .withMessage('Invalid ID !'),
 
