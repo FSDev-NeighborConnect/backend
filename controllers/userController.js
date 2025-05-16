@@ -68,7 +68,7 @@ async function deleteUser(req, res) {
         clearAuthCookies(res);  // Deletes auth cookie & token, logs user out
         return res.status(200).json({ message: `User ${user.name} has been deleted.` });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete user!', error: err.message });
+        res.status(500).json({ message: 'Failed to delete user!', error: error.message });
     }
 }
 

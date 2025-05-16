@@ -60,6 +60,23 @@ describe('Event Routes (integration)', () => {
       expect(res.status).toBe(401); // Auth middleware rejects user missing from DB
       expect(res.body.message).toBe('User no longer exists!');
     });
+
+    it('triggers global error handler on schema validation failure', async () => {
+      jest.spyOn(console, 'error').mockImplementation(() => { });
+
+      const res = await request(server)
+        .post('/api/events/event')
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken)
+        .send({ title: 'Too Short' }); // Missing required fields
+
+      expect(res.status).toBe(500);
+      expect(res.body).toHaveProperty('message');
+      expect(res.body.message).toMatch(/server error/i);
+
+      console.error.mockRestore();
+    });
+
   });
 
   describe('GET /api/events/zip', () => {

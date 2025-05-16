@@ -163,6 +163,7 @@ describe('User Routes (integration)', () => {
 
       expect(res.status).toBe(404);
     });
+
   });
 
   describe('POST /api/users/upload-avatar', () => {
@@ -203,5 +204,28 @@ describe('User Routes (integration)', () => {
     });
   });
 
+  describe('GET /api/users/all', () => {
+    it('returns all users with public fields only', async () => {
+      await createTestUser({ email: 'a@example.com', name: 'User A' });
+      await createTestUser({ email: 'b@example.com', name: 'User B' });
 
+      const res = await request(server)
+        .get('/api/users/all')
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThanOrEqual(2);
+
+      // Ensure each user only contains public fields
+      for (const user of res.body) {
+        expect(user).toHaveProperty('name');
+        expect(user).toHaveProperty('streetAddress');
+        expect(user).toHaveProperty('postalCode');
+        expect(user).not.toHaveProperty('email');
+        expect(user).not.toHaveProperty('password');
+      }
+    });
+  });
 });
