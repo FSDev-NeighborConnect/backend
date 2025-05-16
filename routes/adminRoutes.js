@@ -10,13 +10,15 @@ const {
   getAllPosts,
   getAllEvents,
   adminDeleteEvent,
-  adminUpdateEvent
+  adminUpdateEvent,
+  getAllComments,
+  adminDeleteComment
 } = require('../controllers/adminController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { requireAdmin } = require('../middleware/adminMiddleware');
 const { adminLogin } = require('../controllers/adminAuthController');
-const { validatePostId, validateGetAllUsers } = require('../middleware/validator');
+const { validatePostId, validateGetAllUsers, validateCommentId } = require('../middleware/validator');
 
 
 router.post('/login', adminLogin);  // declared before middleware
@@ -37,5 +39,8 @@ router.get('/all/events', validateGetAllUsers, getAllEvents);
 // Get all posts route, authenticates user first
 router.get('/all/posts', getAllPosts);
 
+
+router.get('/all/comments', getAllComments);
+router.delete('/comments/:id', validateCommentId, adminDeleteComment);
 
 module.exports = router;
