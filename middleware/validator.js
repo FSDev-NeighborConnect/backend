@@ -37,6 +37,15 @@ const validateLogIn = [
 
 // To validate Post ID request
 const validatePostId = [
+  param('id')
+    .isMongoId()
+    .withMessage('Invalid ID !'),
+
+  handleValidation
+];
+
+// Specifically for comment routes for parameter clarity
+const validatePostIdParam = [
   param('postId')
     .isMongoId()
     .withMessage('Invalid ID !'),
@@ -220,5 +229,6 @@ module.exports = {
   validateEventId,
   validateEventCreation,
   validateCommentId,
-  validateCommentCreation
+  validateCommentCreation,
+  validatePostIdParam
 };
