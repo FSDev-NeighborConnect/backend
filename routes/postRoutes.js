@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
+const {likePost, getLikesCount, getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { validatePostId, validatePostCreation } = require('../middleware/validator');
@@ -24,5 +24,9 @@ router.get('/:id', validatePostId, getPostByID)
 router.delete('/:id', deletePost);
 
 router.get('/user/:id', getUserPosts);
+
+router.post('/:id/like',validatePostId, likePost)
+router.get('/likes/:id',validatePostId,  getLikesCount)
+
 
 module.exports = router;

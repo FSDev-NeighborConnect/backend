@@ -1,5 +1,6 @@
 const Post = require("../models/Post");
 const User = require("../models/User")
+const Like = require("../models/Like")
 
 const getAllPosts = async (req, res) => {
   try {
@@ -109,5 +110,45 @@ const getUserPosts = async (req, res) => {
   }
 }
 
+const likePost = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  
+    try {
+    const existingLike = await Like.findOne({userId: userId, postId: id })
 
-module.exports = { getAllPosts, deletePost, getPostsByZip, createPost, getPostByID, getUserPosts };
+    if (existingLike) {
+      // User already liked then remove the like
+      await Like.findByIdAndDelete(existingLike._id)
+      return res.status(200).json({ message: 'Post unliked' })
+    }
+
+    // User hasn't liked yet → create a like
+    const newLike = new Like({ userId:userId, postId: id })
+    await newLike.save()
+    res.status(201).json({ message: 'Post liked', like: newLike })
+  } catch (error) {
+    res.status(500).json({ message: 'Error toggling like', error })
+  }
+}
+
+
+// Get the count for total number of likes for a post
+
+  
+  const getLikesCount = async (req, res) => {
+  const { id } = req.params
+
+  try {
+    const likes = await Like.find({ postId: id })
+    res.json({ count: likes.length, likes })
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching likes', error })
+  }}
+
+
+
+
+module.exports = {getLikesCount, likePost, 
+  getAllPosts, deletePost, getPostsByZip,
+   createPost, getPostByID, getUserPosts };
