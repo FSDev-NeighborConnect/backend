@@ -4,7 +4,7 @@ const router = express.Router();
 const { likePost, getLikesCount, getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
-const { validatePostId, validatePostCreation } = require('../middleware/validator');
+const { validatePostId, validatePostCreation, validatePostIdParam } = require('../middleware/validator');
 const commentRoutes = require('./commentRoutes');
 
 router.use(authenticate);
@@ -32,7 +32,7 @@ router.post('/:id/like', validatePostId, likePost)
 router.get('/likes/:id', validatePostId, getLikesCount)
 
 
-router.use('/:postId/comments', validatePostId, commentRoutes);
+router.use('/:postId/comments', validatePostIdParam, commentRoutes);
 
 
 
