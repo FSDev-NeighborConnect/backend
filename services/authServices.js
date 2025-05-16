@@ -22,7 +22,7 @@ function setAuthCookies(res, token) {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',  // sends cookie only over https when server is deployed
-    sameSite: 'None', // stop frontend - backend communication from breaking due to separate deployment or different local ports
+    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // stop frontend - backend communication from breaking due to separate deployment or different local ports
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 

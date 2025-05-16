@@ -9,6 +9,8 @@ const { validatePostId, validatePostCreation } = require('../middleware/validato
 router.use(authenticate);
 router.use(csrfProtection);
 
+router.get('/user/:id', getUserPosts);
+
 // Get all posts route, authenticates user first
 router.get('/all/posts', getAllPosts);
 
@@ -17,12 +19,9 @@ router.get('/zip', getPostsByZip);
 
 //Create a new post
 router.post('/post', validatePostCreation, createPost)
-
 // Visit a post 
 router.get('/:id', validatePostId, getPostByID)
 
 router.delete('/:id', deletePost);
-
-router.get('/user/:id', getUserPosts);
 
 module.exports = router;
