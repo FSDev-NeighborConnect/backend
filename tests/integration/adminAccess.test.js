@@ -1,7 +1,7 @@
 const request = require('supertest');
 const server = require('../../server.js');
-const { createTestUser } = require('../utils/testUser.js');
-const { loginHelper } = require('../utils/testAuth.js');
+const createTestUser = require('../utils/testUser.js');
+const loginHelper = require('../utils/testAuth.js');
 const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
 
 let authCookie, csrfToken;

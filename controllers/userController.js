@@ -68,7 +68,7 @@ async function deleteUser(req, res) {
         clearAuthCookies(res);  // Deletes auth cookie & token, logs user out
         return res.status(200).json({ message: `User ${user.name} has been deleted.` });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete user!', error: err.message });
+        res.status(500).json({ message: 'Failed to delete user!', error: error.message });
     }
 }
 
@@ -121,18 +121,33 @@ const uploadCoverImage = async (req, res) => {
 const getCurrentUser = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
-        if (!user){
+        if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
         res.status(200).json({
-        id: user._id,
-        role: user.role,
-        csrfToken: req.user.csrfToken
-});
+            id: user._id,
+            role: user.role,
+            csrfToken: req.user.csrfToken
+        });
 
-    }catch (err) {
+    } catch (err) {
         next(err);
-}};
+    }
+};
+
+const getAllUsers = async (req, res, next) => {
+    try {
+        const publicFields = 'name streetAddress postalCode avatar'; // add more if needed
+        const allUsers = await User.find().select(publicFields);
+        if (allUsers) {
+            return res.status(200).json(allUsers)
+        } else {
+            return res.status(404).json({ message: 'No Users found' });
+        }
+    } catch (err) {
+        next(err);
+    }
+}
 
 module.exports = {
     getUserById,
@@ -141,5 +156,6 @@ module.exports = {
     deleteUser,
     uploadAvatarImage,
     uploadCoverImage,
-    getCurrentUser
+    getCurrentUser,
+    getAllUsers
 };
