@@ -1,8 +1,6 @@
-// tests/userRoutes.test.js
 const request = require('supertest');
 const server = require('../../server.js');
 const User = require('../../models/User.js');
-const { hashPassword } = require('../../utils/hash.js');
 const {
   setupTestDB,
   teardownTestDB,

@@ -79,15 +79,14 @@ exports.loginUser = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
 
-  const logUserOut = (req, res) => {
-    try {
-      clearAuthCookies(res);
-      res.status(204).send();
+exports.logUserOut = (req, res, next) => {
+  try {
+    clearAuthCookies(res);
+    res.status(204).send();
 
-    } catch (err) {
-      next(err);
-    }
-  };
-
+  } catch (err) {
+    next(err);
+  }
 };
