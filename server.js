@@ -30,10 +30,17 @@ const allowedOrigins = [
   process.env.FRONTEND_DEVPREVIEW_URL
 ];
 
+// Added for testing-------------
 app.use(cors({
-  origin: allowedOrigins,
+  origin: 'http://localhost:3000', // or 3000 if that's your frontend port
   credentials: true
-})); // Allow requests with cookies from frontend as both had different port.
+}));
+// ---added for testing above part.
+
+// app.use(cors({
+//   origin: allowedOrigins,
+//   credentials: true
+// })); // Allow requests with cookies from frontend as both had different port.
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
