@@ -68,7 +68,13 @@ const eventSchema = new mongoose.Schema({
   rsvp: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  }],
+
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }]
+
 
 }, {
   timestamps: true
