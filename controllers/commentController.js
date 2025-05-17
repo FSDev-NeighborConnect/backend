@@ -34,7 +34,7 @@ const getCommentsByPost = async (req, res, next) => {
     }
 
     const comments = await Comment.find({ post: postId })
-      .populate('author', 'name');
+      .populate('author', 'name avatar');
 
     res.status(200).json(comments);
   } catch (err) {
