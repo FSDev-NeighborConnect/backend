@@ -16,6 +16,15 @@ const createEvent = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+    // Parse hobbies if it's a JSON string
+    let parsedHobbies = hobbies;
+    if (typeof hobbies === 'string') {
+      try {
+        parsedHobbies = JSON.parse(hobbies);
+      } catch (e) {
+        parsedHobbies = [];
+      }
+    }
 
 
     let image = undefined;
@@ -36,7 +45,7 @@ const createEvent = async (req, res, next) => {
     const newEvent = new Event({
       title, date,
       startTime, endTime, streetAddress,
-      postalCode, description, hobbies,
+      postalCode, description, hobbies: parsedHobbies,
       createdBy: req.user.id,
       ...(image && { eventImage: image })
     });
