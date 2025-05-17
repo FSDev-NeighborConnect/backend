@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { clearAuthCookies } = require('../services/authServices');
 const uploadImageToCloudinary = require('../utils/cloudinaryUploader');
+const deleteCloudinaryImage = require('../utils/cloudinaryCleaner');
 
 const getUserById = async (req, res, next) => {
     try {
@@ -63,6 +64,9 @@ async function deleteUser(req, res) {
                 message: 'You can only delete your own profile, not someone else!',
             });
         }
+
+        await deleteCloudinaryImage(user.avatar.public_id);
+        await deleteCloudinaryImage(user.cover.public_id);
 
         await user.deleteOne();
         clearAuthCookies(res);  // Deletes auth cookie & token, logs user out
