@@ -171,6 +171,49 @@ const rsvpToEvent = async (req, res) => {
   }
 };
 
+const likeEvent = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  
+  try {
+    const event = await Event.findById(id);
+    
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+    
+    // Initialize likes array if it doesn't exist
+    if (!event.likes) {
+      event.likes = [];
+    }
+    
+    // Check if user already liked the event
+    const userLikedIndex = event.likes.indexOf(userId);
+    
+    if (userLikedIndex !== -1) {
+      // User already liked, so unlike
+      event.likes.splice(userLikedIndex, 1);
+      await event.save();
+      return res.status(200).json({ 
+        message: 'Event unliked',
+        likes: event.likes,
+        count: event.likes.length
+      });
+    } else {
+      // User hasn't liked, so add like
+      event.likes.push(userId);
+      await event.save();
+      return res.status(200).json({ 
+        message: 'Event liked',
+        likes: event.likes,
+        count: event.likes.length
+      });
+    }
+  } catch (err) {
+    console.error('Error liking event:', err);
+    res.status(500).json({ message: 'Failed to like event', error: err.message });
+  }
+};
 
 
 
@@ -180,6 +223,7 @@ module.exports = {
   getZipEvents,
   getEventByID,
   deleteEvent,
-  rsvpToEvent
+  rsvpToEvent,
+  likeEvent
 };
 

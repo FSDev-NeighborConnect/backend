@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { createEvent, getZipEvents, getUserEvents, getEventByID, deleteEvent, rsvpToEvent } = require('../controllers/eventController');
+const { createEvent, getZipEvents, getUserEvents, getEventByID, deleteEvent, rsvpToEvent, likeEvent } = require('../controllers/eventController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
 const { validateEventCreation,
@@ -24,6 +24,8 @@ router.get('/zip', getZipEvents);
 router.get('/user/:id', validateUserId, getUserEvents);
 // Visit a Event 
 router.get('/:id', validateEventId, getEventByID)
+// Like an event
+router.post('/:id/like', validateEventId, likeEvent);
 
 
 // To delete event based on event id
