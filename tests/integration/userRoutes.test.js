@@ -74,6 +74,21 @@ describe('User Routes (integration)', () => {
 
       expect(res.status).toBe(403);
     });
+
+    it('handles DB error during user update', async () => {
+      jest.spyOn(User, 'findByIdAndUpdate').mockImplementationOnce(() => {
+        throw new Error('DB down');
+      });
+
+      const res = await request(server)
+        .put(`/api/users/${user.id}`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken)
+        .send({ bio: 'Test fail' });
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBe('Failed to update profile');
+    });
   });
 
   describe('GET /api/users/zip/:zip', () => {
@@ -162,6 +177,20 @@ describe('User Routes (integration)', () => {
         .set('X-CSRF-Token', csrfToken);
 
       expect(res.status).toBe(404);
+    });
+
+    it('handles DB error during user deletion', async () => {
+      jest.spyOn(User.prototype, 'deleteOne').mockImplementationOnce(() => {
+        throw new Error('Deletion failed');
+      });
+
+      const res = await request(server)
+        .delete(`/api/users/${user.id}`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(500);
+      expect(res.body.message).toBe('Failed to delete user!');
     });
 
   });
