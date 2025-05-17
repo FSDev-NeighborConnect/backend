@@ -1,10 +1,11 @@
 const Event = require("../models/Event");
 const User = require("../models/User")
+const uploadImageToCloudinary = require('../utils/cloudinaryUploader');
 
 
 const createEvent = async (req, res, next) => {
   try {
-    const { eventImage, title, date,
+    const { title, date,
       startTime, endTime, streetAddress,
       postalCode, description, hobbies
     } = req.body;
@@ -15,11 +16,29 @@ const createEvent = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+
+    let image = undefined;
+
+    if (req.file) {
+      const folder = `events/${user.id}`;
+      const result = await uploadImageToCloudinary(req.file.buffer, folder, [
+        { width: 800, height: 400, crop: 'fill' }
+      ]);
+
+      image = {
+        url: result.secure_url,
+        public_id: result.public_id
+      };
+    }
+
+
     const newEvent = new Event({
-      eventImage, title, date,
+      title, date,
       startTime, endTime, streetAddress,
       postalCode, description, hobbies,
       createdBy: req.user.id,
+      ...(image && { eventImage: image })
     });
 
     await newEvent.save();
@@ -39,7 +58,7 @@ const getZipEvents = async (req, res, next) => {
     const user = await User.findById(req.user.id)
     const postalCode = user.postalCode;
     // Find event in DB using postal code  and populate the creator's name
-    const events = await Event.find({postalCode}).populate('createdBy', 'name');
+    const events = await Event.find({ postalCode }).populate('createdBy', 'name');
     if (events) {
       return res.status(200).json({ events });
     } else {
@@ -54,7 +73,7 @@ const getZipEvents = async (req, res, next) => {
 const getUserEvents = async (req, res, next) => {
   try {
     const userId = req.params.id;
-     // Find event in DB using user ID received in request and populate the creator's name
+    // Find event in DB using user ID received in request and populate the creator's name
     const eventDetails = await Event.find({ createdBy: userId }).populate('createdBy', 'name');
 
     if (eventDetails.length > 0) {
@@ -144,11 +163,11 @@ const rsvpToEvent = async (req, res) => {
 
 
 module.exports = {
-    createEvent, 
-    getUserEvents, 
-    getZipEvents, 
-    getEventByID, 
-    deleteEvent,
-    rsvpToEvent
+  createEvent,
+  getUserEvents,
+  getZipEvents,
+  getEventByID,
+  deleteEvent,
+  rsvpToEvent
 };
 

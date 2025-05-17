@@ -28,12 +28,20 @@ app.use(express.urlencoded({ extended: true })); //Added extended true to get ne
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_DEVPREVIEW_URL
-]
+].filter(Boolean); // this is essential
 
-app.use(cors({
-  origin: allowedOrigins,
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
-}));
+};
+
+app.use(cors(corsOptions));
+app.options(/^\/api\/.*/, cors(corsOptions));
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
