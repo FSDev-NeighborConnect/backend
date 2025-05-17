@@ -19,16 +19,10 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 app.set('trust proxy', 1);  // needed for secure cookies in deployment
 
-//Middleware
-app.use(express.json());
-app.use(sanitizeRequest); //protect from NoSQL injection by removing '$' and '.'
-app.use(cookieParser());
-app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
-
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_DEVPREVIEW_URL
-].filter(Boolean); // this is essential
+].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -42,6 +36,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options(/^\/api\/.*/, cors(corsOptions));
+
+//Middleware
+app.use(express.json());
+app.use(sanitizeRequest); //protect from NoSQL injection by removing '$' and '.'
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
+
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
