@@ -17,7 +17,25 @@ const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
-// app.set('trust proxy', true);
+app.set('trust proxy', 1);  // needed for secure cookies in deployment
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_DEVPREVIEW_URL
+].filter(Boolean);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options(/^\/api\/.*/, cors(corsOptions));
 
 //Middleware
 app.use(express.json());
@@ -25,22 +43,6 @@ app.use(sanitizeRequest); //protect from NoSQL injection by removing '$' and '.'
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true })); //Added extended true to get neat & clean java objects from arrays
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.FRONTEND_DEVPREVIEW_URL
-];
-
-// Added for testing-------------
-app.use(cors({
-  origin: 'http://localhost:3000', // or 3000 if that's your frontend port
-  credentials: true
-}));
-// ---added for testing above part.
-
-// app.use(cors({
-//   origin: allowedOrigins,
-//   credentials: true
-// })); // Allow requests with cookies from frontend as both had different port.
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);

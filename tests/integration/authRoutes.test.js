@@ -30,6 +30,22 @@ describe('Auth Routes (integration)', () => {
       expect(res.statusCode).toBe(201);
       expect(res.body).toHaveProperty('message', 'User registered successfully.');
     });
+
+    it('returns 400 for invalid signup email', async () => {
+      const res = await request(server)
+        .post('/api/signup')
+        .send({
+          name: 'Bad Email User',
+          email: 'not-an-email',
+          password: 'Test12345678!',
+          streetAddress: 'Bad st',
+          postalCode: '00000',
+          phone: '1234567890'
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.errors[0].msg).toMatch(/valid email/i);
+    });
   });
 
   describe('POST /api/login', () => {
@@ -59,7 +75,23 @@ describe('Auth Routes (integration)', () => {
       expect(res.body).toHaveProperty('csrfToken');
       expect(typeof res.body.csrfToken).toBe('string');
     });
+    it('returns 400 if user already exists', async () => {
+      await createTestUser({ email: 'existing@example.com' });
 
+      const res = await request(server)
+        .post('/api/signup')
+        .send({
+          name: 'Existing User',
+          email: 'existing@example.com',
+          password: 'Test12345678!',
+          streetAddress: 'Existing Street',
+          postalCode: '12345',
+          phone: '1234567890'
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.message).toBe('User already exists.');
+    });
     it('should fail with wrong password', async () => {
       const res = await request(server)
         .post('/api/login')
@@ -67,6 +99,36 @@ describe('Auth Routes (integration)', () => {
 
       expect(res.statusCode).toBe(400);
     });
+    it('returns 400 if email is missing', async () => {
+      const res = await request(server)
+        .post('/api/login')
+        .send({ password: 'mypassword' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0].msg).toMatch(/email|password/i);
+    });
+
+    it('returns 400 if password is missing', async () => {
+      const res = await request(server)
+        .post('/api/login')
+        .send({ email: 'test@example.com' });
+
+      expect(res.status).toBe(400);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0].msg).toMatch(/email|password/i);
+    });
+
+    it('returns 400 if both email and password are missing', async () => {
+      const res = await request(server)
+        .post('/api/login')
+        .send({});
+
+      expect(res.status).toBe(400);
+      expect(res.body.errors).toBeDefined();
+      expect(res.body.errors[0].msg).toMatch(/email|password/i);
+    });
+
   });
 
   describe('POST /api/logout', () => {

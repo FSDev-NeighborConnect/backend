@@ -1,11 +1,10 @@
 const User = require('../models/User');
 const Post = require('../models/Post');
 const Event = require('../models/Event');
-const { clearAuthCookies } = require('../services/authServices');
 const { hashPassword } = require('../utils/hash');
+const Comment = require('../models/Comment');
 
 
-// PUT /api/admin/users/:id
 const adminUpdateUser = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
@@ -50,7 +49,6 @@ const getAllUsers = async (req, res, next) => {
   }
 }
 
-// Admin rights to delete post
 const adminDeletePost = async (req, res, next) => {
   try {
     const postId = req.params.id;
@@ -174,6 +172,33 @@ const adminUpdateEvent = async (req, res) => {
   };
 };
 
+const getAllComments = async (req, res, next) => {
+  try {
+    const comments = await Comment.find()
+      .populate('author', 'name')
+      .populate('post', 'title')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(comments);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const adminDeleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.id);
+    if (!comment) {
+      return res.status(404).json({ message: 'Comment not found!' });
+    }
+
+    await comment.deleteOne();
+    res.status(200).json({ message: 'Comment deleted by admin' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   adminDeleteUser,
   adminUpdateUser,
@@ -184,5 +209,7 @@ module.exports = {
   getAllEvents,
   getAllPosts,
   adminDeleteEvent,
-  adminUpdateEvent
+  adminUpdateEvent,
+  getAllComments,
+  adminDeleteComment
 };

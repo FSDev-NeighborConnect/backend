@@ -4,6 +4,7 @@ const Post = require('../../models/Post.js');
 const createTestUser = require('../utils/testUser.js');
 const loginHelper = require('../utils/testAuth.js');
 const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
+const Like = require('../../models/Like.js');
 
 let user, authCookie, csrfToken;
 
@@ -185,4 +186,77 @@ describe('Post Routes (integration)', () => {
       expect(res.status).toBe(404);
     });
   });
+
+  describe('POST /api/posts/:id/like', () => {
+    it('likes a post if not liked already', async () => {
+      const post = await Post.create({
+        title: 'Like Test',
+        description: 'Like this post!',
+        status: 'open',
+        street: user.streetAddress,
+        postalCode: user.postalCode,
+        createdBy: user.id
+      });
+
+      const res = await request(server)
+        .post(`/api/posts/${post.id}/like`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(201);
+      expect(res.body.message).toBe('Post liked');
+
+      const like = await Like.findOne({ postId: post.id, userId: user.id });
+      expect(like).not.toBeNull();
+    });
+
+    it('unlikes a post if already liked', async () => {
+      const post = await Post.create({
+        title: 'Unlike Test',
+        description: 'Test unlike',
+        status: 'open',
+        street: user.streetAddress,
+        postalCode: user.postalCode,
+        createdBy: user.id
+      });
+
+      await Like.create({ postId: post.id, userId: user.id });
+
+      const res = await request(server)
+        .post(`/api/posts/${post.id}/like`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Post unliked');
+
+      const like = await Like.findOne({ postId: post.id, userId: user.id });
+      expect(like).toBeNull();
+    });
+  });
+
+  describe('GET /api/posts/likes/:id', () => {
+    it('returns the number of likes for a post', async () => {
+      const post = await Post.create({
+        title: 'Count Likes',
+        description: 'Count these',
+        status: 'open',
+        street: user.streetAddress,
+        postalCode: user.postalCode,
+        createdBy: user.id
+      });
+
+      await Like.create({ postId: post.id, userId: user.id });
+
+      const res = await request(server)
+        .get(`/api/posts/likes/${post.id}`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body.count).toBe(1);
+      expect(res.body.likes[0].userId).toBe(user.id);
+    });
+  });
+
 });

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const {likePost, getLikesCount, getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
+const { likePost, getLikesCount, getAllPosts, getPostsByZip, createPost, deletePost, getPostByID, getUserPosts } = require('../controllers/postController');
 const { authenticate } = require('../middleware/authenticate');
 const { csrfProtection } = require('../middleware/csrf');
-const { validatePostId, validatePostCreation } = require('../middleware/validator');
+const { validatePostId, validatePostCreation, validatePostIdParam } = require('../middleware/validator');
+const commentRoutes = require('./commentRoutes');
 
 router.use(authenticate);
 router.use(csrfProtection);
@@ -27,8 +28,12 @@ router.delete('/:id', deletePost);
 
 router.get('/user/:id', getUserPosts);
 
-router.post('/:id/like',validatePostId, likePost)
-router.get('/likes/:id',validatePostId,  getLikesCount)
+router.post('/:id/like', validatePostId, likePost)
+router.get('/likes/:id', validatePostId, getLikesCount)
+
+
+router.use('/:postId/comments', validatePostIdParam, commentRoutes);
+
 
 
 module.exports = router;
