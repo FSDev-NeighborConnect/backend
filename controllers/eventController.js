@@ -1,6 +1,7 @@
 const Event = require("../models/Event");
 const User = require("../models/User")
 const uploadImageToCloudinary = require('../utils/cloudinaryUploader');
+const deleteCloudinaryImage = require('../utils/cloudinaryCleaner');
 
 
 const createEvent = async (req, res, next) => {
@@ -118,6 +119,8 @@ const deleteEvent = async (req, res) => {
     if (event.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'You are not the owner of this event!' });
     }
+
+    await deleteCloudinaryImage(event.eventImage.public_id);
 
     await event.deleteOne();
 
