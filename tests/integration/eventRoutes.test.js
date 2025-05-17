@@ -228,4 +228,48 @@ describe('Event Routes (integration)', () => {
       expect(res.body.message).toBe('Event not found');
     });
   });
+
+  describe('POST /api/events/:id/like', () => {
+    it('likes an event successfully', async () => {
+      const event = await createTestEvent({ createdBy: user.id });
+
+      const res = await request(server)
+        .post(`/api/events/${event.id}/like`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Event liked');
+      expect(res.body.count).toBe(1);
+      expect(res.body.likes).toContain(user.id);
+    });
+
+    it('unlikes an already liked event', async () => {
+      const event = await createTestEvent({ createdBy: user.id });
+      event.likes.push(user.id);
+      await event.save();
+
+      const res = await request(server)
+        .post(`/api/events/${event.id}/like`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe('Event unliked');
+      expect(res.body.count).toBe(0);
+      expect(res.body.likes).not.toContain(user.id);
+    });
+
+    it('returns 404 if event not found', async () => {
+      const fakeId = new mongoose.Types.ObjectId().toString();
+
+      const res = await request(server)
+        .post(`/api/events/${fakeId}/like`)
+        .set('Cookie', authCookie)
+        .set('X-CSRF-Token', csrfToken);
+
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBe('Event not found');
+    });
+  });
 });
