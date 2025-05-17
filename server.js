@@ -17,7 +17,7 @@ const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
-// app.set('trust proxy', true);
+app.set('trust proxy', 1);  // needed for secure cookies in deployment
 
 //Middleware
 app.use(express.json());
@@ -28,12 +28,12 @@ app.use(express.urlencoded({ extended: true })); //Added extended true to get ne
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.FRONTEND_DEVPREVIEW_URL
-];
+]
 
 app.use(cors({
   origin: allowedOrigins,
   credentials: true
-})); // Allow requests with cookies from frontend as both had different port.
+}));
 
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
