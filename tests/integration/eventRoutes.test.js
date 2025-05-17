@@ -8,6 +8,11 @@ const loginHelper = require('../utils/testAuth.js');
 const { setupTestDB, teardownTestDB, clearDB } = require('../utils/testDb.js');
 const mongoose = require('mongoose');
 
+jest.mock(
+  '../../utils/cloudinaryUploader.js',
+  () => require('../utils/mockCloudinaryUploader.js')
+);
+
 let authCookie, csrfToken, user;
 
 beforeAll(setupTestDB);
@@ -22,29 +27,29 @@ describe('Event Routes (integration)', () => {
 
   describe('POST /api/events/event', () => {
     it('creates a new event successfully', async () => {
-      const eventData = {
-        eventImage: 'Test (no need to load resources)',
-        title: 'Test Event',
-        date: new Date().toISOString(),
-        startTime: new Date().toISOString(),
-        endTime: new Date(new Date().getTime() + 3600000).toISOString(),
-        streetAddress: '123 Test St',
-        postalCode: user.postalCode,
-        description: 'This is a valid event description.'
-      };
-
       const res = await request(server)
         .post('/api/events/event')
         .set('Cookie', authCookie)
         .set('X-CSRF-Token', csrfToken)
-        .send(eventData);
+        .field('title', 'Test Event')
+        .field('date', new Date().toISOString())
+        .field('startTime', new Date().toISOString())
+        .field('endTime', new Date(Date.now() + 3600000).toISOString())
+        .field('streetAddress', '123 Test St')
+        .field('postalCode', user.postalCode)
+        .field('description', 'This is a valid event description.')
+        .attach('eventImage', Buffer.from('fake-image-content'), 'event.jpg');
 
       expect(res.status).toBe(201);
       expect(res.body.message).toMatch(/event created successfully/i);
 
       const events = await Event.find({ createdBy: user.id });
       expect(events).toHaveLength(1);
-      expect(events[0].title).toBe(eventData.title);
+      expect(events[0].title).toBe('Test Event');
+      expect(events[0].eventImage).toMatchObject({
+        url: expect.stringContaining('http'),
+        public_id: expect.any(String),
+      });
     });
 
     it('returns 404 if authenticated user not found in DB', async () => {
