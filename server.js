@@ -7,6 +7,8 @@ const express = require('express');
 const path = require('path');
 const { sanitizeRequest } = require('./middleware/sanitize');
 const cookieParser = require('cookie-parser');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
 
 //Addition of controllers
 const authRoutes = require('./routes/authRoutes');
@@ -17,6 +19,12 @@ const errorHandler = require('./middleware/errorHandler');
 const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
+const swaggerDocument = YAML.load('./docs/swagger.yaml');
+
+if (process.env.ENABLE_API_DOCS === 'true') {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
+
 app.set('trust proxy', 1);  // needed for secure cookies in deployment
 
 const allowedOrigins = [
@@ -26,7 +34,7 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));
