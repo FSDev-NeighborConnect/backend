@@ -34,10 +34,14 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (allowedOrigins.includes(origin)) {
+    // Allow no-origin requests (e.g. form POSTs, redirects)
+    // Safe due to exhaustive auth middleware & security checks,
+    // all sensitive actions require JWT + CSRF validation, etc.
+    if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    console.warn('Blocked CORS request from:', origin);
+    return callback(null, false);
   },
   credentials: true
 };
