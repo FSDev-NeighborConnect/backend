@@ -1,0 +1,994 @@
+openapi: 3.0.0
+info:
+  title: Neighborhood Connect API
+  version: 1.0.0
+  description: |
+    Neighborhood Connect is the go-to community hub to:
+      - Lend a hand, connect with others, organize events
+      - Post random questions ("anyone got a ladder?")
+      - RSVP to block parties, garage sales & meetups
+      - Keep track of what's happening in your zip code
+
+    Core endpoints for Neighborhood Connect, including:
+      - User auth (signup/login/logout)
+      - Profile management & uploads
+      - Posts with likes
+      - Events with RSVP & likes
+      - Comments on posts
+      - Basic admin overview
+
+  contact:
+    name: Neighborhood Connect Team
+    url: https://github.com/FSDev-NeighborConnect
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Auth
+    description: Signup, login and logout flows
+  - name: Users
+    description: |
+      Profile CRUD, ZIP lookup, updating details and listing users.
+
+      *(Note: avatar and cover uploads are handled client-side and excluded from public docs)*
+  - name: Posts
+    description: Create/read/delete posts, toggle likes, get like counts
+  - name: Events
+    description: Create/list/get/delete events, RSVP & like toggles
+  - name: Comments
+    description: Create/list/delete comments on posts
+  - name: Admin
+    description: Admin-only - manage users, posts, events, comments
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+    csrf:
+      type: apiKey
+      in: header
+      name: x-csrf-token
+
+  schemas:
+    ### AUTH ###
+    RegisterUser:
+      type: object
+      description: Payload for new user registration.
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginUser:
+      type: object
+      description: Request payload for logging in a user, containing their email and password.
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+      example:
+        email: "user@example.com"
+        password: "hunter123"
+
+    AuthResponse:
+      type: object
+      description: Wrapper for authentication responses, including a message, the authenticated user's minimal info and a CSRF token.
+      properties:
+        message:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+            role:
+              type: string
+        csrfToken:
+          type: string
+
+    ### GENERIC ###
+    ErrorResponse:
+      type: object
+      description: Standard error envelope, with a human-readable message and optional internal error detail.
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      description: Generic success wrapper for operations that only return a confirmation message.
+      properties:
+        message:
+          type: string
+
+    ### USERS ###
+    UserSummary:
+      type: object
+      description: A user's public profile summary, including contact info, avatar/cover URLs, bio, hobbies, role and timestamps.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        streetAddress:
+          type: string
+        postalCode:
+          type: string
+        phone:
+          type: string
+        avatar:
+          type: object
+          nullable: true
+          properties:
+            url:
+              type: string
+              format: uri
+            public_id:
+              type: string
+        cover:
+          type: object
+          nullable: true
+          properties:
+            url:
+              type: string
+              format: uri
+            public_id:
+              type: string
+        bio:
+          type: string
+        hobbies:
+          type: array
+          items:
+            type: string
+        role:
+          type: string
+          enum:
+            - member
+            - admin
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UpdateUser:
+      type: object
+      description: Payload for updating one's own profile fields (name, address, phone, bio, hobbies).
+      properties:
+        name:
+          type: string
+        streetAddress:
+          type: string
+        phone:
+          type: string
+        bio:
+          type: string
+        hobbies:
+          type: array
+          items:
+            type: string
+
+    ### POSTS ###
+    CreatePost:
+      type: object
+      description: Request body for creating a new post, including title, description, optional categories and status.
+      required:
+        - title
+        - description
+        - status
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+            - open
+            - in progress
+            - closed
+
+    PostSummary:
+      type: object
+      description: Summary view of a post, with identifiers, metadata, creator info and timestamps.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        category:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        createdBy:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    LikeToggleResponse:
+      type: object
+      description: Response when toggling a like on a post or event, returning a message, updated like count and list of user IDs who've liked.
+      properties:
+        message:
+          type: string
+        count:
+          type: integer
+        likes:
+          type: array
+          items:
+            type: string
+
+    LikesCountResponse:
+      type: object
+      description: Response listing total like count and array of user IDs who've liked an item.
+      properties:
+        count:
+          type: integer
+        likes:
+          type: array
+          items:
+            type: string
+
+    ### EVENTS ###
+    CreateEvent:
+      type: object
+      description: Request body for creating an event, including title, timing, location, description, optional hobbies tags and optional image upload.
+      required:
+        - title
+        - date
+        - startTime
+        - endTime
+        - streetAddress
+        - postalCode
+        - description
+      properties:
+        title:
+          type: string
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        streetAddress:
+          type: string
+        postalCode:
+          type: string
+        description:
+          type: string
+        hobbies:
+          type: array
+          items:
+            type: string
+
+    EventSummary:
+      type: object
+      description: Summary view of an event, with identifiers, timing, creator info, RSVP list, likes list and timestamps.
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+          format: date
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        createdBy:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        rsvp:
+          type: array
+          items:
+            type: string
+        likes:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RSVPResponse:
+      type: object
+      description: Response for RSVP operations, returning a message and the updated total RSVP count.
+      properties:
+        message:
+          type: string
+        totalRsvp:
+          type: integer
+
+    ### COMMENTS ###
+    CreateComment:
+      type: object
+      description: Request body for adding a comment to a post, containing just the comment's content.
+      required:
+        - content
+      properties:
+        content:
+          type: string
+
+    CommentSummary:
+      type: object
+      description: Summary view of a comment, including its ID, content, author info and timestamps.
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        author:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ### ADMIN ###
+    AdminLogin:
+      allOf:
+        - $ref: "#/components/schemas/LoginUser"
+      description: Alias of the login payload for admin authentication (same as LoginUser).
+
+    AdminUserList:
+      type: array
+      description: Array of UserSummary objects returned when an admin lists all users.
+      items:
+        $ref: "#/components/schemas/UserSummary"
+
+paths:
+  ### AUTH ###
+  /api/signup:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
+      responses:
+        "201":
+          description: Created + sets auth cookie & CSRF token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Error on signup
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/login:
+    post:
+      tags:
+        - Auth
+      summary: Login existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        "200":
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              example:
+                message: "Login successful"
+                user:
+                  id: "abc123"
+                  email: "user@example.com"
+                  role: "member"
+                csrfToken: "secure-csrf-token"
+        "400":
+          description: Error on login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout current user (clears cookie)
+      security:
+        - cookieAuth: []
+          csrf: []
+      responses:
+        "204":
+          description: No content
+        "403":
+          description: Logout error, user unathenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  ### USERS ###
+  /api/users/me:
+    get:
+      tags:
+        - Users
+      summary: Get current user profile
+      security:
+        - cookieAuth: []
+          csrf: []
+      responses:
+        "200":
+          description: "Successful current user info retrieval"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "401":
+          description: Error, user not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/users/{id}:
+    put:
+      tags:
+        - Users
+      summary: Update your own profile.
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUser"
+      responses:
+        "200":
+          description: "Successful user update of own profile"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSummary"
+        "403":
+          description: "Error, not authenticated"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Users
+      summary: Delete own account
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successful user info retrieval by ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "403":
+          description: Error, not authenticated or attempting to delete another user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/users/zip/{zip}:
+    get:
+      tags:
+        - Users
+      summary: List users by postal code
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: zip
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+        "404":
+          description: Error, not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  ### POSTS ###
+  /api/posts:
+    post:
+      tags:
+        - Posts
+      summary: Create a new post for your neighbors.
+      security:
+        - cookieAuth: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePost"
+      responses:
+        "201":
+          description: "Successful post creation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Post creation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    get:
+      tags:
+        - Posts
+      summary: List all posts
+      responses:
+        "200":
+          description: Array of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostSummary"
+
+  /api/posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Get a single post by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successful post retrieval by ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostSummary"
+        "404":
+          description: Post retrieval failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Posts
+      summary: Delete own post
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successful deletion of own post"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "403":
+          description: Post retrieval failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/posts/{id}/like:
+    post:
+      tags:
+        - Posts
+      summary: Toggle like on a post
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successfully liked a post"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeToggleResponse"
+
+  /api/posts/{id}/likes:
+    get:
+      tags:
+        - Posts
+      summary: Get likes count & list
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Successfully retrieved likes on post"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikesCountResponse"
+
+  ### EVENTS ###
+  /api/events:
+    post:
+      tags:
+        - Events
+      summary: Post an event your neighbors can RSVP to
+      security:
+        - cookieAuth: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEvent"
+      responses:
+        "201":
+          description: Successfully created a new event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Event creation failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    get:
+      tags:
+        - Events
+      summary: List all events
+      responses:
+        "200":
+          description: Array of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventSummary"
+
+  /api/events/{id}:
+    get:
+      tags:
+        - Events
+      summary: Get event by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved event by ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventSummary"
+        "404":
+          description: Retrieval failed, event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Events
+      summary: Delete own event
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully deleted own event by ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "403":
+          description: Event deletion failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/events/{id}/rsvp:
+    post:
+      tags:
+        - Events
+      summary: RSVP toggle for an event
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: RSVP on event successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RSVPResponse"
+        "400":
+          description: RSVP toggle failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/events/{id}/like:
+    post:
+      tags:
+        - Events
+      summary: Toggle like on an event
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event successfully liked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeToggleResponse"
+
+  ### COMMENTS ###
+  /api/posts/{postId}/comments:
+    post:
+      tags:
+        - Comments
+      summary: Add a comment to a post
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateComment"
+      responses:
+        "201":
+          description: "Successfully added comment to post"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentSummary"
+        "400":
+          description: Failed to add comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    get:
+      tags:
+        - Comments
+      summary: List comments for a post
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Array of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentSummary"
+
+  /api/posts/{postId}/comments/{id}:
+    delete:
+      tags:
+        - Comments
+      summary: Delete own comment
+      security:
+        - cookieAuth: []
+          csrf: []
+      parameters:
+        - in: path
+          name: postId
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully deleted own comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "403":
+          description: Failed to delete own comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  ### ADMIN (overview only) ###
+  /api/admin/login:
+    post:
+      tags:
+        - Admin
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLogin"
+      responses:
+        "200":
+          description: Successful admin login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+
+  /api/admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users (admin)
+      security:
+        - cookieAuth: []
+          csrf: []
+      responses:
+        "200":
+          description: "Success on listing all users for admin"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserList"
