@@ -18,7 +18,7 @@ function createAuthPayload(user) {
   return { token, csrfToken };
 }
 
-function setAuthCookies(res, token, csrfToken) {
+function setAuthCookies(res, token) {
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',  // sends cookie only over https when server is deployed
@@ -26,13 +26,6 @@ function setAuthCookies(res, token, csrfToken) {
     maxAge: 7 * 24 * 60 * 60 * 1000
   });
 
-  // Set CSRF token cookie
-  res.cookie('csrfToken', csrfToken, {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-    maxAge: 24 * 60 * 60 * 1000
-  });
 }
 
 // Logout logic for endpoint, to be implemented later
@@ -41,12 +34,6 @@ function clearAuthCookies(res) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None'
-  });
-
-  res.clearCookie('csrfToken', {
-    httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
   });
 }
 
