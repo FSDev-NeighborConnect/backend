@@ -56,7 +56,7 @@ exports.loginUser = async (req, res, next) => {
       if (pwdMatch) {
         const { token, csrfToken } = createAuthPayload(userExists);
 
-        setAuthCookies(res, token);
+        setAuthCookies(res, token, csrfToken);
 
         res.status(200).json({
           message: "Login successful",
@@ -65,7 +65,6 @@ exports.loginUser = async (req, res, next) => {
             email: userExists.email,
             role: userExists.role
           },
-          csrfToken: csrfToken
         });
 
       } else {

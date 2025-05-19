@@ -21,11 +21,10 @@ async function adminLogin(req, res) {
 
   const { token, csrfToken } = createAuthPayload(user);
 
-  setAuthCookies(res, token);
+  setAuthCookies(res, token, csrfToken);
 
   return res.status(200).json({
     message: 'Admin logged in.',
-    csrfToken: csrfToken
   });
 }
 
