@@ -19,10 +19,6 @@ function createAuthPayload(user) {
 }
 
 function setAuthCookies(res, token, csrfToken) {
-  const frontendDomain = process.env.NODE_ENV === 'production' 
-    ? new URL(process.env.FRONTEND_URL).hostname 
-    : undefined
-
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',  // sends cookie only over https when server is deployed
@@ -35,7 +31,6 @@ function setAuthCookies(res, token, csrfToken) {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-    domain: process.env.NODE_ENV === 'production'? frontendDomain : undefined,
     maxAge: 24 * 60 * 60 * 1000
   });
 }
